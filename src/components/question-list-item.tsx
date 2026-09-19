@@ -1,7 +1,6 @@
 "use client";
 
 import { useRef, useState } from "react";
-import Link from "next/link";
 import { Markdown } from "@/components/markdown";
 import { BookmarkIcon, CheckIcon, ChevronIcon, LinkIcon } from "@/components/icons";
 import { difficultyLabels, difficultyStyles, titleize } from "@/lib/format";
@@ -117,12 +116,6 @@ export function QuestionListItem({
                     <LinkIcon className="size-3.5" />
                     {copied ? "Tersalin" : "Bagikan"}
                   </button>
-                  <Link
-                    href={shareHref}
-                    className="link-accent inline-flex h-11 items-center px-2 text-sm sm:h-8"
-                  >
-                    Buka halaman soal
-                  </Link>
                 </div>
               </div>
             </div>
