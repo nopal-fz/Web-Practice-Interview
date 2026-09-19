@@ -100,3 +100,24 @@ export async function getFilterOptions() {
   const [roles, categories] = await Promise.all([getRoleCounts(), getCategoryCounts()]);
   return { roles: roles.map((r) => r.value), categories: categories.map((c) => c.value) };
 }
+
+// ponytail: sampling acak via shuffle JS, bukan orderBy random Prisma (tidak disupport).
+function shuffle<T>(items: T[]): T[] {
+  const a = [...items];
+  for (let i = a.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [a[i], a[j]] = [a[j], a[i]];
+  }
+  return a;
+}
+
+export async function getQuizQuestions(
+  filters: { role?: string; difficulty?: string; count?: number },
+): Promise<QuestionListItem[]> {
+  const where: Prisma.QuestionWhereInput = {};
+  if (filters.role) where.role = filters.role;
+  if (filters.difficulty) where.difficulty = filters.difficulty;
+
+  const rows = await prisma.question.findMany({ where });
+  return shuffle(rows).slice(0, filters.count ?? rows.length);
+}

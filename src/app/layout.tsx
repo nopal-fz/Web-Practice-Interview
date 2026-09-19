@@ -76,6 +76,12 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
                 Semua soal
               </Link>
               <Link
+                href="/quiz"
+                className="rounded-md px-3 py-2 text-gray-600 hover:text-[var(--accent)] dark:text-zinc-300 sm:py-0"
+              >
+                Latihan
+              </Link>
+              <Link
                 href="/admin"
                 className="rounded-md px-3 py-2 text-gray-600 hover:text-[var(--accent)] dark:text-zinc-300 sm:py-0"
               >
