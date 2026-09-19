@@ -1,0 +1,457 @@
+@import "tailwindcss";
+
+/* Dark mode dikontrol kelas `.dark` di <html> (set oleh inline script + toggle). */
+@custom-variant dark (&:where(.dark, .dark *));
+
+:root {
+  color-scheme: light;
+
+  /* Permukaan kertas hangat, bukan putih klinis */
+  --background: #f9f7f4;
+  --surface: #ffffff;
+  --surface-muted: #f2f0eb;
+  --border: #e7e4dd;
+  --border-strong: #d6d2c8;
+
+  --fg: #201e1b;
+  --fg-muted: #57534e;
+  --fg-soft: #7a746c;
+
+  --accent: #0f766e;
+  --accent-btn: #0f766e;
+  --accent-btn-hover: #115e59;
+  --accent-on: #ffffff;
+
+  --badge-easy-bg: #ecfdf5;
+  --badge-easy-fg: #055534;
+  --badge-easy-ring: rgba(16, 185, 129, 0.28);
+  --badge-medium-bg: #fffbeb;
+  --badge-medium-fg: #8a4a0e;
+  --badge-medium-ring: rgba(245, 158, 11, 0.3);
+  --badge-hard-bg: #fff1f2;
+  --badge-hard-fg: #9f1239;
+  --badge-hard-ring: rgba(244, 63, 94, 0.25);
+
+  --code-kw: #0f766e;
+  --code-str: #a16207;
+  --code-num: #be123c;
+  --code-com: #a8a29e;
+}
+
+.dark {
+  color-scheme: dark;
+
+  /* Abu hampir-hitam hangat, bukan pitch black */
+  --background: #0e0e11;
+  --surface: #17171b;
+  --surface-muted: #212126;
+  --border: #28282e;
+  --border-strong: #3a3a42;
+
+  --fg: #ececea;
+  --fg-muted: #a8a8b0;
+  --fg-soft: #8d8d96;
+
+  --accent: #2dd4bf;
+  --accent-btn: #0f766e;
+  --accent-btn-hover: #0d9488;
+  --accent-on: #ffffff;
+
+  --badge-easy-bg: rgba(16, 185, 129, 0.13);
+  --badge-easy-fg: #6ee7b7;
+  --badge-easy-ring: rgba(16, 185, 129, 0.4);
+  --badge-medium-bg: rgba(245, 158, 11, 0.13);
+  --badge-medium-fg: #fcd34d;
+  --badge-medium-ring: rgba(245, 158, 11, 0.38);
+  --badge-hard-bg: rgba(244, 63, 94, 0.13);
+  --badge-hard-fg: #fda4af;
+  --badge-hard-ring: rgba(244, 63, 94, 0.38);
+
+  --code-kw: #2dd4bf;
+  --code-str: #fbbf24;
+  --code-num: #fb7185;
+  --code-com: #71737c;
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--fg);
+  --color-accent: var(--accent);
+  --color-border: var(--border);
+  --font-sans: var(--font-geist-sans), ui-sans-serif, system-ui, sans-serif;
+  --font-mono: var(--font-geist-mono), ui-monospace, SFMono-Regular, monospace;
+  --font-display: var(--font-fraunces), ui-serif, Georgia, serif;
+}
+
+body {
+  background: var(--background);
+  color: var(--fg);
+  font-family: var(--font-geist-sans), ui-sans-serif, system-ui, sans-serif;
+}
+
+::selection {
+  background: color-mix(in oklab, var(--accent) 25%, transparent);
+}
+
+:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
+summary::-webkit-details-marker {
+  display: none;
+}
+
+@layer components {
+  /* Kartu dan panel */
+  .card {
+    border-radius: 0.875rem;
+    border: 1px solid var(--border);
+    background: var(--surface);
+  }
+  .card-hover {
+    transition: border-color 160ms ease;
+  }
+  .card-hover:hover {
+    border-color: var(--accent);
+  }
+  .panel {
+    border-radius: 0.875rem;
+    border: 1px dashed var(--border-strong);
+  }
+  .hairline {
+    border-bottom: 1px solid var(--border);
+  }
+  .lines > * + * {
+    border-top: 1px solid var(--border);
+  }
+
+  /* Kontrol */
+  .field {
+    width: 100%;
+    border-radius: 0.5rem;
+    border: 1px solid var(--border-strong);
+    background: var(--surface);
+    color: var(--fg);
+    font-size: 0.875rem;
+    transition: border-color 160ms ease;
+  }
+  .field::placeholder {
+    color: var(--fg-soft);
+  }
+  .field:focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: 1px;
+    border-color: var(--accent);
+  }
+
+  .btn-primary {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.375rem;
+    border-radius: 0.5rem;
+    background: var(--accent-btn);
+    color: var(--accent-on);
+    font-size: 0.875rem;
+    font-weight: 500;
+    transition: background-color 160ms ease;
+  }
+  .btn-primary:hover {
+    background: var(--accent-btn-hover);
+  }
+  .btn-primary:disabled {
+    opacity: 0.6;
+  }
+
+  .btn-ghost {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.375rem;
+    border-radius: 0.5rem;
+    border: 1px solid var(--border-strong);
+    background: var(--surface);
+    color: var(--fg);
+    font-size: 0.875rem;
+    transition: border-color 160ms ease, color 160ms ease;
+  }
+  .btn-ghost:hover {
+    border-color: var(--accent);
+    color: var(--accent);
+  }
+
+  .link-accent {
+    color: var(--accent);
+    text-decoration: underline;
+    text-underline-offset: 2px;
+  }
+  .link-accent:hover {
+    opacity: 0.85;
+  }
+
+  /* Chip tag dan kategori */
+  .chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    border-radius: 999px;
+    border: 1px solid var(--border);
+    background: var(--surface);
+    color: var(--fg-muted);
+    font-size: 0.8125rem;
+    transition: border-color 160ms ease, color 160ms ease;
+  }
+  .chip:hover {
+    border-color: var(--accent);
+    color: var(--accent);
+  }
+
+  /* Label editorial */
+  .eyebrow {
+    font-family: var(--font-geist-mono), ui-monospace, monospace;
+    font-size: 0.6875rem;
+    text-transform: uppercase;
+    letter-spacing: 0.09em;
+    color: var(--fg-soft);
+  }
+
+  /* Badge kesulitan: motif identitas, ring inset + warna status */
+  .badge {
+    display: inline-flex;
+    align-items: center;
+    border-radius: 0.375rem;
+    padding: 0.125rem 0.5rem;
+    font-size: 0.75rem;
+    font-weight: 500;
+    box-shadow: inset 0 0 0 1px var(--badge-ring, rgba(0, 0, 0, 0.1));
+  }
+  .badge-easy {
+    background: var(--badge-easy-bg);
+    color: var(--badge-easy-fg);
+    box-shadow: inset 0 0 0 1px var(--badge-easy-ring);
+  }
+  .badge-medium {
+    background: var(--badge-medium-bg);
+    color: var(--badge-medium-fg);
+    box-shadow: inset 0 0 0 1px var(--badge-medium-ring);
+  }
+  .badge-hard {
+    background: var(--badge-hard-bg);
+    color: var(--badge-hard-fg);
+    box-shadow: inset 0 0 0 1px var(--badge-hard-ring);
+  }
+  .badge-muted {
+    background: var(--surface-muted);
+    color: var(--fg-muted);
+    box-shadow: inset 0 0 0 1px var(--border);
+  }
+
+  /* Reveal jawaban ala flashcard */
+  .answer-grid {
+    display: grid;
+    grid-template-rows: 0fr;
+    opacity: 0;
+    transition: grid-template-rows 320ms cubic-bezier(0.4, 0, 0.2, 1), opacity 220ms ease;
+  }
+  .answer-grid.open {
+    grid-template-rows: 1fr;
+    opacity: 1;
+  }
+  .answer-grid > .answer-inner {
+    overflow: hidden;
+    min-height: 0;
+  }
+}
+
+/* ---- Konten jawaban (markdown) ---- */
+.prose-answer {
+  color: var(--fg-muted);
+  font-size: 0.9375rem;
+  line-height: 1.75;
+}
+.prose-answer > :first-child {
+  margin-top: 0;
+}
+.prose-answer h1,
+.prose-answer h2,
+.prose-answer h3 {
+  color: var(--fg);
+  font-weight: 600;
+  font-size: 1rem;
+  margin: 1.5rem 0 0.5rem;
+  letter-spacing: -0.01em;
+}
+.prose-answer h2 {
+  font-size: 0.972rem;
+}
+.prose-answer h3 {
+  font-size: 0.9375rem;
+}
+.prose-answer p {
+  margin: 0.5rem 0;
+}
+.prose-answer ul,
+.prose-answer ol {
+  margin: 0.5rem 0;
+  padding-left: 1.3rem;
+  display: grid;
+  gap: 0.25rem;
+}
+.prose-answer ul {
+  list-style: disc;
+}
+.prose-answer ol {
+  list-style: decimal;
+}
+.prose-answer li::marker {
+  color: var(--accent);
+}
+.prose-answer strong {
+  color: var(--fg);
+  font-weight: 600;
+}
+.prose-answer a {
+  color: var(--accent);
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+.prose-answer blockquote {
+  margin: 0.75rem 0;
+  border-left: 2px solid var(--accent);
+  padding-left: 0.75rem;
+  color: var(--fg-soft);
+  font-style: italic;
+}
+.prose-answer hr {
+  margin: 1.25rem 0;
+  border-color: var(--border);
+}
+.prose-answer :not(pre) > code {
+  background: var(--surface-muted);
+  border: 1px solid var(--border);
+  border-radius: 0.25rem;
+  padding: 0.1em 0.35em;
+  font-family: var(--font-geist-mono), ui-monospace, monospace;
+  font-size: 0.85em;
+  color: var(--fg);
+}
+.prose-answer pre {
+  margin: 0.75rem 0;
+  border: 1px solid var(--border);
+  border-radius: 0.5rem;
+  background: var(--surface-muted);
+  padding: 0.875rem 1rem;
+  overflow-x: auto;
+  font-size: 0.8125rem;
+  line-height: 1.65;
+}
+.prose-answer pre > code {
+  background: transparent;
+  border: 0;
+  padding: 0;
+  color: var(--fg);
+}
+.prose-answer table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 0.75rem 0;
+  font-size: 0.8125rem;
+}
+.prose-answer th {
+  text-align: left;
+  border: 1px solid var(--border);
+  background: var(--surface-muted);
+  padding: 0.375rem 0.625rem;
+  color: var(--fg);
+  font-weight: 600;
+}
+.prose-answer td {
+  border: 1px solid var(--border);
+  padding: 0.375rem 0.625rem;
+  vertical-align: top;
+}
+
+/* Token syntax highlighting, 4 warna (bukan pelangi) */
+.prose-answer .hljs-keyword,
+.prose-answer .hljs-built_in,
+.prose-answer .hljs-selector-tag,
+.prose-answer .hljs-name,
+.prose-answer .hljs-tag {
+  color: var(--code-kw);
+}
+.prose-answer .hljs-string,
+.prose-answer .hljs-attr,
+.prose-answer .hljs-attribute {
+  color: var(--code-str);
+}
+.prose-answer .hljs-number,
+.prose-answer .hljs-literal,
+.prose-answer .hljs-symbol {
+  color: var(--code-num);
+}
+/* Blok kode dengan header bahasa + tombol salin */
+.code-block {
+  margin: 0.75rem 0;
+  border: 1px solid var(--border);
+  border-radius: 0.5rem;
+  overflow: hidden;
+}
+.prose-answer .code-block pre {
+  margin: 0;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+}
+.code-block pre > code {
+  background: transparent;
+  border: 0;
+  padding: 0;
+  color: var(--fg);
+}
+.code-block pre code {
+  display: block;
+  overflow-x: auto;
+}
+
+.prose-answer .hljs-comment,
+.prose-answer .hljs-quote,
+.prose-answer .hljs-doctag {
+  color: var(--code-com);
+  font-style: italic;
+}
+
+/* Chips role: scroll horizontal tanpa scrollbar, fade halus di tepi kanan */
+.role-scroller {
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  overscroll-behavior-x: contain;
+  scrollbar-width: none;
+  mask-image: linear-gradient(to right, black calc(100% - 1.25rem), transparent);
+  -webkit-mask-image: linear-gradient(to right, black calc(100% - 1.25rem), transparent);
+}
+.role-scroller::-webkit-scrollbar {
+  display: none;
+}
+.chip {
+  display: inline-flex;
+  align-items: center;
+  border: 1px solid var(--border-strong);
+  border-radius: 9999px;
+  background: var(--surface);
+  font-size: 0.875rem;
+  transition: border-color 0.15s ease, color 0.15s ease;
+}
+.chip:hover {
+  border-color: var(--accent);
+  color: var(--accent);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    transition-duration: 0.01ms !important;
+    animation-duration: 0.01ms !important;
+  }
+}
