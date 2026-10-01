@@ -9,7 +9,8 @@ export function DeleteButton({ label = "Hapus" }: { label?: string }) {
           event.preventDefault();
         }
       }}
-      className="rounded px-2 py-2 text-sm text-rose-600 underline underline-offset-2 hover:text-rose-700 dark:text-rose-400"
+      className="min-h-[40px] px-2 py-2 text-sm underline underline-offset-2 transition-colors"
+      style={{ color: "var(--danger)" }}
     >
       {label}
     </button>

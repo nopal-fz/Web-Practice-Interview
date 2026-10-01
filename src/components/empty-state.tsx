@@ -13,11 +13,11 @@ export function EmptyState({
   actionLabel?: string;
 }) {
   return (
-    <div className="panel px-5 py-8 text-center text-sm">
-      <p className="font-medium text-[var(--fg)]">{title}</p>
-      {description && <p className="mt-1 leading-relaxed text-[var(--fg-muted)]">{description}</p>}
+    <div className="border-y border-border py-12 text-center">
+      <p className="font-medium text-foreground">{title}</p>
+      {description && <p className="mt-1 text-sm leading-relaxed text-fg-muted">{description}</p>}
       {actionHref && actionLabel && (
-        <Link href={actionHref} className="btn-ghost mt-4 px-4 py-3 sm:py-2">
+        <Link href={actionHref} className="btn-ghost mt-4 px-4 py-2 text-sm">
           {actionLabel}
         </Link>
       )}

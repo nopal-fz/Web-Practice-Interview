@@ -9,7 +9,7 @@ export function ImportForm() {
 
   return (
     <form action={formAction} className="space-y-5">
-      <label className="flex flex-col gap-1 text-sm font-medium text-[var(--fg-muted)] sm:max-w-xs">
+      <label className="flex flex-col gap-1 text-sm font-medium text-fg-muted sm:max-w-xs">
         Format
         <select
           name="format"
@@ -22,12 +22,12 @@ export function ImportForm() {
         </select>
       </label>
 
-      <label className="flex flex-col gap-1 text-sm font-medium text-[var(--fg-muted)]">
+      <label className="flex flex-col gap-1 text-sm font-medium text-fg-muted">
         File {format.toUpperCase()} (opsional)
         <input type="file" name="file" accept={format === "json" ? ".json,application/json" : ".csv,text/csv"} className="text-sm" />
       </label>
 
-      <label className="flex flex-col gap-1 text-sm font-medium text-[var(--fg-muted)]">
+      <label className="flex flex-col gap-1 text-sm font-medium text-fg-muted">
         Atau tempel data langsung
         <textarea
           name="data"
@@ -43,7 +43,11 @@ export function ImportForm() {
       </label>
 
       {state.error && (
-        <p className="rounded-lg border border-rose-500/20 bg-rose-500/10 px-3 py-2 text-sm text-rose-600 dark:text-rose-400">
+        <p
+          role="alert"
+          className="rounded border px-3 py-2 text-sm text-fg"
+          style={{ borderColor: "var(--danger)", background: "var(--badge-hard-bg)" }}
+        >
           {state.error}
         </p>
       )}

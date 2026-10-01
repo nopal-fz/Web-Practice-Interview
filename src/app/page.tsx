@@ -1,111 +1,229 @@
 import Link from "next/link";
-import { getCategoryCounts, getRoleCounts, getTotalCount } from "@/lib/questions";
-import { titleize } from "@/lib/format";
-import { roleDescription, roleIcon, roleLabel } from "@/lib/roles";
+import { getTotalCount, getQuizQuestions, getStats, getQuestions, getFilterOptions } from "@/lib/questions";
+import { buildQuery, titleize } from "@/lib/format";
+import { QuizShell } from "@/components/quiz-shell";
+import { QuestionList } from "@/components/question-list";
+import { roleLabel } from "@/lib/roles";
+import type { QuestionFilters } from "@/lib/questions";
 
 export const dynamic = "force-dynamic";
 
-export default async function Home() {
-  const [total, roles, categories] = await Promise.all([
+type SearchParams = {
+  mode?: string;
+  quizRole?: string;
+  quizDifficulty?: string;
+  quizCount?: string;
+  questionRole?: string;
+  questionCategory?: string;
+  questionDifficulty?: string;
+  questionQ?: string;
+  questionPage?: string;
+  questionBookmarked?: string;
+  questionMastered?: string;
+};
+
+function first(value: string | string[] | undefined): string | undefined {
+  if (Array.isArray(value)) return value[0];
+  return value || undefined;
+}
+
+function RoleFilter({ roles, filters }: { roles: string[]; filters: QuestionFilters }) {
+  const all = [{ role: undefined }, ...roles.map((role) => ({ role }))];
+  return (
+    <div className="role-scroller">
+      <ul className="flex w-max gap-2 sm:w-auto sm:flex-wrap">
+        {all.map(({ role }) => {
+          const query = buildQuery({ ...filters, questionRole: role, questionPage: undefined });
+          return (
+            <li key={role ?? "all"}>
+              <Link
+                href={query ? `/?${query}` : "/"}
+                aria-current={filters.role === role ? "true" : undefined}
+                className="chip px-3 py-1.5 text-sm"
+              >
+                {role ? roleLabel(role) : "Semua peran"}
+              </Link>
+            </li>
+          );
+        })}
+      </ul>
+    </div>
+  );
+}
+
+export default async function Home({ searchParams }: { searchParams: Promise<SearchParams> }) {
+  const sp = await searchParams;
+  const latihanMode = first(sp.mode) === "latihan";
+
+  const [total, stats, questionOptions] = await Promise.all([
     getTotalCount(),
-    getRoleCounts(),
-    getCategoryCounts(),
+    getStats(),
+    getFilterOptions(),
   ]);
 
+  const quizRole = first(sp.quizRole);
+  const quizDifficulty = first(sp.quizDifficulty);
+  const countRaw = Number.parseInt(first(sp.quizCount) ?? "", 10);
+  const quizCount = Number.isNaN(countRaw) ? undefined : Math.max(1, Math.min(100, countRaw));
+  const hasQuizParams = Boolean(quizRole || quizDifficulty || quizCount);
+  const quizQuestions = latihanMode && hasQuizParams
+    ? await getQuizQuestions({ role: quizRole, difficulty: quizDifficulty, count: quizCount })
+    : [];
+
+  const questionMode: "all" | "bookmarked" | "mastered" =
+    first(sp.questionBookmarked) === "1"
+      ? "bookmarked"
+      : first(sp.questionMastered) === "1"
+      ? "mastered"
+      : "all";
+  const questionFilters = {
+    role: first(sp.questionRole),
+    category: first(sp.questionCategory),
+    difficulty: first(sp.questionDifficulty),
+    q: first(sp.questionQ),
+  };
+  const requestedQuestionPage = Number.parseInt(first(sp.questionPage) ?? "1", 10);
+
+  const { items, total: filteredTotal, totalPages, page } = await getQuestions(
+    questionFilters,
+    Number.isNaN(requestedQuestionPage) ? 1 : requestedQuestionPage,
+    { limit: questionMode !== "all" ? 1000 : undefined },
+  );
+
+  const hasFilters = Boolean(
+    questionFilters.role || questionFilters.category || questionFilters.difficulty || questionFilters.q,
+  );
+  const baseQuery = buildQuery(questionFilters);
+
+  const hrefAll = `/?${buildQuery({
+    ...questionFilters,
+    questionBookmarked: undefined,
+    questionMastered: undefined,
+  })}`;
+  const hrefBookmarked = `/?${buildQuery({ ...questionFilters, questionBookmarked: "1", questionPage: undefined })}`;
+  const hrefMastered = `/?${buildQuery({ ...questionFilters, questionMastered: "1", questionPage: undefined })}`;
+
   return (
-    <div className="space-y-12">
-      <section className="space-y-5">
-        <p className="eyebrow">{total} soal tersedia</p>
-        <h1 className="font-display max-w-2xl text-3xl font-semibold tracking-tight leading-tight sm:text-4xl">
-          Latihan soal interview untuk peran data dan AI.
+    <div className="space-y-8">
+      <header>
+        <h1 className="font-display text-2xl font-semibold tracking-tight text-foreground">
+          Soal interview Machine Learning dan AI
         </h1>
-        <p className="max-w-xl text-sm leading-relaxed text-[var(--fg-muted)]">
-          Jawaban bisa dibuka-tutup untuk self-quiz: baca pertanyaannya, jawab sendiri dulu,
-          baru cek pembahasannya.
+        <p className="mt-2 text-sm leading-relaxed text-fg-muted">
+          {total} soal dengan pembahasan bertingkat: rumus, intuition, dan kode yang bisa langsung
+          dijalankan.
         </p>
+      </header>
 
-        <form action="/questions" className="flex max-w-xl gap-2">
-          <input
-            type="search"
-            name="q"
-            placeholder="Cari topik, mis. window function, RAG, overfitting"
-            aria-label="Cari soal"
-            className="field min-w-0 flex-1 px-3 py-3 sm:py-2"
-          />
-          <button type="submit" className="btn-primary px-4 py-3 sm:py-2">
-            Cari
-          </button>
-        </form>
-      </section>
+      <nav className="flex gap-5 border-b border-border" aria-label="Mode">
+        <Link
+          href="/"
+          aria-current={latihanMode ? undefined : "page"}
+          className={`-mb-px border-b-2 pb-2.5 text-sm font-medium transition-colors ${
+            latihanMode
+              ? "border-transparent text-fg-muted hover:text-foreground"
+              : "border-primary-accent text-foreground"
+          }`}
+        >
+          Katalog
+        </Link>
+        <Link
+          href="/?mode=latihan"
+          aria-current={latihanMode ? "page" : undefined}
+          className={`-mb-px border-b-2 pb-2.5 text-sm font-medium transition-colors ${
+            latihanMode
+              ? "border-primary-accent text-foreground"
+              : "border-transparent text-fg-muted hover:text-foreground"
+          }`}
+        >
+          Latihan
+        </Link>
+      </nav>
 
-      {total === 0 ? (
-        <div className="panel px-5 py-5 text-sm text-[var(--fg-muted)]">
-          Belum ada soal di database. Tambahkan lewat{" "}
-          <Link href="/admin" className="link-accent">
-            halaman admin
-          </Link>{" "}
-          atau jalankan <code className="rounded border border-[var(--border)] bg-[var(--surface-muted)] px-1.5 py-0.5 text-xs">npm run db:seed</code>.
-        </div>
+      {latihanMode ? (
+        <QuizShell
+          key={[quizRole ?? "", quizDifficulty ?? "", String(quizCount ?? "")].join("|")}
+          questions={quizQuestions}
+          roleOptions={stats.roles}
+          total={stats.total}
+          requested={hasQuizParams}
+          role={quizRole}
+          difficulty={quizDifficulty}
+          count={quizCount}
+        />
       ) : (
-        <>
-          <section className="space-y-4">
-            <div className="flex items-baseline justify-between gap-4">
-              <h2 className="font-display text-lg font-semibold tracking-tight">Per role</h2>
-              <Link href="/questions" className="link-accent text-sm">
-                Lihat semua
-              </Link>
-            </div>
-            <ul className="grid gap-3 md:grid-cols-2">
-              {roles.map((role, index) => {
-                const Icon = roleIcon(role.value);
-                return (
-                  <li key={role.value}>
-                    <Link
-                      href={`/questions?role=${encodeURIComponent(role.value)}`}
-                      className="card card-hover flex gap-3 p-4"
-                    >
-                      <span className="flex size-9 shrink-0 items-center justify-center rounded-lg border border-[var(--border)] bg-[var(--surface-muted)] text-[var(--accent)]">
-                        {Icon && <Icon size={18} strokeWidth={1.75} />}
-                      </span>
-                      <span className="min-w-0 flex-1">
-                        <span className="flex items-baseline justify-between gap-2">
-                          <span className="font-display text-base font-semibold tracking-tight group-hover:text-[var(--accent)]">
-                            {roleLabel(role.value)}
-                          </span>
-                          <span className="eyebrow">{String(index + 1).padStart(2, "0")}</span>
-                        </span>
-                        <span className="mt-0.5 block text-sm leading-relaxed text-[var(--fg-muted)]">
-                          {roleDescription(role.value) ||
-                            `${role.count} soal latihan untuk role ${roleLabel(role.value).toLowerCase()}.`}
-                        </span>
-                      </span>
-                      <span className="self-center text-sm tabular-nums text-[var(--fg-soft)]">
-                        {role.count} soal
-                      </span>
-                    </Link>
-                  </li>
-                );
-              })}
-            </ul>
-          </section>
+        <div className="space-y-6">
+          <form action="/" method="get" className="grid gap-3 sm:grid-cols-[2fr_1fr_1fr]">
+            <label className="flex flex-col gap-1.5 text-xs font-medium text-fg-muted">
+              Cari
+              <input
+                type="search"
+                name="questionQ"
+                defaultValue={questionFilters.q ?? ""}
+                placeholder="Kata kunci atau tag"
+                className="field px-3 py-2 text-sm"
+              />
+            </label>
 
-          <section className="space-y-4">
-            <h2 className="font-display text-lg font-semibold tracking-tight">Per topik</h2>
-            <ul className="flex flex-wrap gap-2">
-              {categories.map((category) => (
-                <li key={category.value}>
-                  <Link
-                    href={`/questions?category=${encodeURIComponent(category.value)}`}
-                    className="chip px-3 py-1.5"
-                  >
-                    {titleize(category.value)}
-                    <span className="tabular-nums text-[var(--fg-soft)]">{category.count}</span>
-                  </Link>
-                </li>
-              ))}
-            </ul>
-          </section>
-        </>
+            <label className="flex flex-col gap-1.5 text-xs font-medium text-fg-muted">
+              Topik
+              <select
+                name="questionCategory"
+                defaultValue={questionFilters.category ?? ""}
+                className="field px-3 py-2 text-sm"
+              >
+                <option value="">Semua topik</option>
+                {questionOptions.categories.map((category) => (
+                  <option key={category} value={category}>
+                    {titleize(category)}
+                  </option>
+                ))}
+              </select>
+            </label>
+
+            <label className="flex flex-col gap-1.5 text-xs font-medium text-fg-muted">
+              Kesulitan
+              <select
+                name="questionDifficulty"
+                defaultValue={questionFilters.difficulty ?? ""}
+                className="field px-3 py-2 text-sm"
+              >
+                <option value="">Semua tingkat</option>
+                <option value="easy">Mudah</option>
+                <option value="medium">Sedang</option>
+                <option value="hard">Sulit</option>
+              </select>
+            </label>
+
+            <div className="flex items-center gap-3 sm:col-span-3">
+              <button type="submit" className="btn-primary px-4 py-2 text-sm">
+                Terapkan
+              </button>
+              {hasFilters && (
+                <Link href="/" className="link-accent text-sm">
+                  Reset
+                </Link>
+              )}
+              <span className="ml-auto text-xs text-fg-soft">
+                {filteredTotal} soal
+              </span>
+            </div>
+          </form>
+
+          <RoleFilter roles={questionOptions.roles} filters={questionFilters} />
+
+          <QuestionList
+            items={items}
+            mode={questionMode}
+            total={filteredTotal}
+            page={page}
+            totalPages={totalPages}
+            hrefAll={hrefAll}
+            hrefBookmarked={hrefBookmarked}
+            hrefMastered={hrefMastered}
+            baseQuery={baseQuery}
+          />
+        </div>
       )}
     </div>
   );

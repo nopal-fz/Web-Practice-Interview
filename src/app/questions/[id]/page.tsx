@@ -57,9 +57,9 @@ export default async function QuestionDetailPage({ params }: Props) {
   });
 
   return (
-    <article className="mx-auto max-w-3xl space-y-6">
-      <Link href="/questions" className="link-accent inline-block text-sm">
-        Kembali ke daftar soal
+    <article className="space-y-6">
+      <Link href="/" className="link-accent inline-block text-sm">
+        Kembali ke katalog soal
       </Link>
 
       <header className="space-y-3">
@@ -70,7 +70,7 @@ export default async function QuestionDetailPage({ params }: Props) {
           <span className="badge badge-muted">{roleLabel(question.role)}</span>
           <span className="badge badge-muted">{titleize(question.category)}</span>
         </div>
-        <h1 className="font-display text-2xl font-semibold tracking-tight leading-snug sm:text-3xl">
+        <h1 className="font-display text-2xl font-semibold leading-snug tracking-tight sm:text-3xl">
           {question.question}
         </h1>
       </header>
@@ -91,7 +91,7 @@ export default async function QuestionDetailPage({ params }: Props) {
         </div>
       )}
 
-      <p className="text-xs text-[var(--fg-soft)]">Terakhir diperbarui {updated}</p>
+      <p className="text-xs text-fg-soft">Terakhir diperbarui {updated}</p>
     </article>
   );
 }

@@ -15,12 +15,12 @@ export function Pagination({
   const end = Math.min(totalPages, start + 4);
   const numbers = Array.from({ length: end - start + 1 }, (_, index) => start + index);
 
-  const base = "rounded-md border px-3 py-3 text-sm tabular-nums sm:py-1.5";
-  const idle = `${base} border-[var(--border-strong)] bg-[var(--surface)] text-[var(--fg-muted)] hover:border-[var(--accent)] hover:text-[var(--accent)]`;
-  const active = `${base} border-[var(--accent-btn)] bg-[var(--accent-btn)] text-white`;
+  const idle =
+    "inline-flex min-h-[40px] items-center rounded border border-border px-3 py-1.5 text-sm text-fg-muted transition-colors hover:border-primary-accent hover:text-foreground";
+  const active = "inline-flex min-h-[40px] items-center rounded border border-primary-accent bg-primary-accent px-3 py-1.5 text-sm text-white";
 
   return (
-    <nav className="flex flex-wrap items-center justify-center gap-1" aria-label="Navigasi halaman">
+    <nav className="flex flex-wrap items-center justify-center gap-1.5" aria-label="Navigasi halaman">
       {page > 1 && (
         <Link href={hrefFor(page - 1)} className={idle}>
           Sebelumnya

@@ -45,7 +45,7 @@ export default async function AdminQuestionsPage({ searchParams }: { searchParam
       <div className="flex flex-wrap items-end justify-between gap-3">
         <div>
           <h1 className="font-display text-2xl font-semibold tracking-tight">Kelola soal</h1>
-          <p className="text-sm text-[var(--fg-muted)]">{total} soal ditemukan.</p>
+          <p className="text-sm text-fg-muted">{total} soal ditemukan.</p>
         </div>
         <Link href="/admin/questions/new" className="btn-primary px-3 py-3 sm:py-2">
           Tambah soal
@@ -57,7 +57,7 @@ export default async function AdminQuestionsPage({ searchParams }: { searchParam
         className="card space-y-3 p-4 lg:flex lg:flex-row lg:items-end lg:gap-3 lg:space-y-0"
       >
         <div className="flex-1 basis-3/5">
-          <label className="flex flex-col gap-1 text-xs font-medium text-[var(--fg-muted)]">
+          <label className="flex flex-col gap-1 text-xs font-medium text-fg-muted">
             Cari
             <input
               type="search"
@@ -69,7 +69,7 @@ export default async function AdminQuestionsPage({ searchParams }: { searchParam
           </label>
         </div>
 
-        <label className="flex flex-col gap-1 text-xs font-medium text-[var(--fg-muted)]">
+        <label className="flex flex-col gap-1 text-xs font-medium text-fg-muted">
           Role
           <select name="role" defaultValue={filters.role ?? ""} className={selectClass}>
             <option value="">Semua role</option>
@@ -81,7 +81,7 @@ export default async function AdminQuestionsPage({ searchParams }: { searchParam
           </select>
         </label>
 
-        <label className="flex flex-col gap-1 text-xs font-medium text-[var(--fg-muted)]">
+        <label className="flex flex-col gap-1 text-xs font-medium text-fg-muted">
           Topik
           <select name="category" defaultValue={filters.category ?? ""} className={selectClass}>
             <option value="">Semua topik</option>
@@ -93,7 +93,7 @@ export default async function AdminQuestionsPage({ searchParams }: { searchParam
           </select>
         </label>
 
-        <label className="flex flex-col gap-1 text-xs font-medium text-[var(--fg-muted)]">
+        <label className="flex flex-col gap-1 text-xs font-medium text-fg-muted">
           Kesulitan
           <select name="difficulty" defaultValue={filters.difficulty ?? ""} className={selectClass}>
             <option value="">Semua tingkat</option>
@@ -119,19 +119,19 @@ export default async function AdminQuestionsPage({ searchParams }: { searchParam
         <table className="w-full min-w-[40rem] text-left text-sm">
           <thead className="hairline text-xs">
             <tr>
-              <th className="px-4 py-2 font-medium text-[var(--fg-soft)]">Pertanyaan</th>
-              <th className="px-4 py-2 font-medium text-[var(--fg-soft)]">Role</th>
-              <th className="px-4 py-2 font-medium text-[var(--fg-soft)]">Topik</th>
-              <th className="px-4 py-2 font-medium text-[var(--fg-soft)]">Kesulitan</th>
-              <th className="px-4 py-2 text-right font-medium text-[var(--fg-soft)]">Aksi</th>
+              <th className="px-4 py-2 font-medium text-fg-soft">Pertanyaan</th>
+              <th className="px-4 py-2 font-medium text-fg-soft">Role</th>
+              <th className="px-4 py-2 font-medium text-fg-soft">Topik</th>
+              <th className="px-4 py-2 font-medium text-fg-soft">Kesulitan</th>
+              <th className="px-4 py-2 text-right font-medium text-fg-soft">Aksi</th>
             </tr>
           </thead>
           <tbody className="lines">
             {items.map((question) => (
-              <tr key={question.id} className="align-top hover:bg-[var(--surface-muted)]">
+              <tr key={question.id} className="align-top hover:bg-surface-muted">
                 <td className="max-w-md px-4 py-3 font-medium">{question.question}</td>
-                <td className="px-4 py-3 text-[var(--fg-muted)]">{roleLabel(question.role)}</td>
-                <td className="px-4 py-3 text-[var(--fg-muted)]">{titleize(question.category)}</td>
+                <td className="px-4 py-3 text-fg-muted">{roleLabel(question.role)}</td>
+                <td className="px-4 py-3 text-fg-muted">{titleize(question.category)}</td>
                 <td className="px-4 py-3">
                   <span className={difficultyStyles[question.difficulty] ?? "badge badge-muted"}>
                     {difficultyLabels[question.difficulty] ?? question.difficulty}
@@ -155,7 +155,7 @@ export default async function AdminQuestionsPage({ searchParams }: { searchParam
             ))}
             {items.length === 0 && (
               <tr>
-                <td colSpan={5} className="px-4 py-6 text-center text-sm text-[var(--fg-soft)]">
+                <td colSpan={5} className="px-4 py-6 text-center text-sm text-fg-soft">
                   Tidak ada soal yang cocok.
                 </td>
               </tr>

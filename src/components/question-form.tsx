@@ -34,7 +34,7 @@ export function QuestionForm({
       {question && <input type="hidden" name="id" value={question.id} />}
 
       <div className="grid gap-4 sm:grid-cols-3">
-        <label className="flex flex-col gap-1 text-sm font-medium text-[var(--fg-muted)]">
+        <label className="flex flex-col gap-1 text-sm font-medium text-fg-muted">
           Role
           <input
             type="text"
@@ -52,7 +52,7 @@ export function QuestionForm({
           </datalist>
         </label>
 
-        <label className="flex flex-col gap-1 text-sm font-medium text-[var(--fg-muted)]">
+        <label className="flex flex-col gap-1 text-sm font-medium text-fg-muted">
           Topik
           <input
             type="text"
@@ -70,7 +70,7 @@ export function QuestionForm({
           </datalist>
         </label>
 
-        <label className="flex flex-col gap-1 text-sm font-medium text-[var(--fg-muted)]">
+        <label className="flex flex-col gap-1 text-sm font-medium text-fg-muted">
           Tingkat kesulitan
           <select name="difficulty" defaultValue={question?.difficulty ?? "medium"} className={fieldClass}>
             <option value="easy">Mudah</option>
@@ -80,12 +80,12 @@ export function QuestionForm({
         </label>
       </div>
 
-      <label className="flex flex-col gap-1 text-sm font-medium text-[var(--fg-muted)]">
+      <label className="flex flex-col gap-1 text-sm font-medium text-fg-muted">
         Pertanyaan
         <textarea name="question" required rows={2} defaultValue={question?.question} className={fieldClass} />
       </label>
 
-      <label className="flex flex-col gap-1 text-sm font-medium text-[var(--fg-muted)]">
+      <label className="flex flex-col gap-1 text-sm font-medium text-fg-muted">
         Tags (pisahkan dengan koma)
         <input
           type="text"
@@ -98,7 +98,7 @@ export function QuestionForm({
 
       <div className="space-y-2">
         <div className="flex items-center justify-between">
-          <span className="text-sm font-medium text-[var(--fg-muted)]">Jawaban (markdown)</span>
+          <span className="text-sm font-medium text-fg-muted">Jawaban (markdown)</span>
           <button
             type="button"
             onClick={() => setPreview((value) => !value)}
@@ -109,7 +109,7 @@ export function QuestionForm({
         </div>
 
         {preview ? (
-          <div className="panel px-4 py-3">
+          <div className="card px-4 py-3">
             <Markdown>{answer || "_Belum ada jawaban._"}</Markdown>
           </div>
         ) : (
@@ -125,7 +125,11 @@ export function QuestionForm({
       </div>
 
       {state.error && (
-        <p className="rounded-lg border border-rose-500/20 bg-rose-500/10 px-3 py-2 text-sm text-rose-600 dark:text-rose-400">
+        <p
+          role="alert"
+          className="rounded border px-3 py-2 text-sm text-fg"
+          style={{ borderColor: "var(--danger)", background: "var(--badge-hard-bg)" }}
+        >
           {state.error}
         </p>
       )}

@@ -9,34 +9,28 @@ import type { QuestionListItem as Item } from "@/lib/questions";
 
 type Props = {
   items: Item[];
-  mode: "all" | "bookmarked";
+  mode: "all" | "bookmarked" | "mastered";
   total: number;
   page: number;
   totalPages: number;
   hrefAll: string;
   hrefBookmarked: string;
+  hrefMastered: string;
   baseQuery: string;
 };
 
-function TabLink({
-  href,
-  active,
-  label,
-}: {
-  href: string;
-  active: boolean;
-  label: string;
-}) {
-  const idle =
-    "border-[var(--border-strong)] bg-[var(--surface)] text-[var(--fg-muted)] hover:border-[var(--accent)] hover:text-[var(--accent)]";
-  const activeClass = "border-[var(--accent-btn)] bg-[var(--accent-btn)] text-[var(--accent-on)]";
+// Underline tabs, not bordered pills: they sit directly on the list below, so they
+// read as one column rather than a row of buttons stacked on top of another.
+function TabLink({ href, active, label }: { href: string; active: boolean; label: string }) {
   return (
     <Link
       href={href}
       role="tab"
       aria-selected={active}
-      className={`inline-flex h-11 items-center rounded-lg border px-4 text-sm font-medium transition-colors sm:h-9 ${
-        active ? activeClass : idle
+      className={`-mb-px border-b-2 pb-2 text-sm transition-colors ${
+        active
+          ? "border-primary-accent text-foreground"
+          : "border-transparent text-fg-muted hover:text-foreground"
       }`}
     >
       {label}
@@ -52,62 +46,91 @@ export function QuestionList({
   totalPages,
   hrefAll,
   hrefBookmarked,
+  hrefMastered,
   baseQuery,
 }: Props) {
   const bookmarks = useQolSet(BOOKMARK_KEY);
   const mastered = useQolSet(MASTERED_KEY);
 
-  const shown = mode === "bookmarked" ? items.filter((item) => bookmarks.has(item.id)) : items;
+  const shown =
+    mode === "bookmarked"
+      ? items.filter((item) => bookmarks.has(item.id))
+      : mode === "mastered"
+      ? items.filter((item) => mastered.has(item.id))
+      : items;
 
   const hrefFor = (target: number) =>
-    `/questions?${baseQuery}${baseQuery ? "&" : ""}page=${String(target)}`;
+    `/?${baseQuery}${baseQuery ? "&" : ""}questionPage=${String(target)}`;
 
   const empty =
     mode === "bookmarked" ? (
       bookmarks.count === 0 ? (
         <EmptyState
-          title="Belum ada soal yang tersimpan."
-          description="Tekan Simpan pada kartu soal untuk mem-bookmark latihan. Tab Tersimpan menampilkan soal yang kamu simpan."
+          title="Belum ada soal tersimpan."
+          description="Buka soal di katalog, lalu tekan Simpan."
           actionHref={hrefAll}
           actionLabel="Lihat semua soal"
         />
       ) : (
         <EmptyState
-          title="Tidak ada soal tersimpan yang cocok dengan filter."
-          description="Beberapa soal tersimpan tidak tampil di filter aktif."
-          actionHref={hrefAll}
+          title="Tidak ada soal tersimpan yang cocok filter."
+          description="Sebagian soal tersimpan tidak cocok dengan filter aktif."
+          actionHref={hrefBookmarked}
           actionLabel="Lihat semua tersimpan"
+        />
+      )
+    ) : mode === "mastered" ? (
+      mastered.count === 0 ? (
+        <EmptyState
+          title="Belum ada soal yang ditandai dikuasai."
+          description="Tandai soal dengan tombol Dikuasai untuk melacak progres."
+          actionHref={hrefAll}
+          actionLabel="Lihat semua soal"
+        />
+      ) : (
+        <EmptyState
+          title="Tidak ada soal dikuasai yang cocok filter."
+          description="Sebagian soal dikuasai tidak cocok dengan filter aktif."
+          actionHref={hrefMastered}
+          actionLabel="Lihat semua dikuasai"
         />
       )
     ) : (
       <EmptyState
         title="Tidak ada soal yang cocok."
-        description="Coba longgarkan filter atau mulai dari kumpulan soal."
-        actionHref="/questions"
-        actionLabel="Reset semua filter"
+        description="Longgarkan kata kunci atau pilih topik lain."
+        actionHref={hrefAll}
+        actionLabel="Hapus filter"
       />
     );
 
   return (
-    <div className="space-y-4">
-      <div className="flex flex-wrap items-center gap-2" role="tablist" aria-label="Daftar soal">
-        <TabLink href={hrefAll} active={mode === "all"} label="Semua" />
-        <TabLink
-          href={hrefBookmarked}
-          active={mode === "bookmarked"}
-          label={`Tersimpan (${bookmarks.count})`}
-        />
-        {mode === "bookmarked" && shown.length > 0 && (
-          <p className="eyebrow ml-auto">
-            {shown.length} dari {total} soal yang cocok tersimpan
+    <div className="space-y-6">
+      <div className="flex items-end justify-between gap-4" role="tablist" aria-label="Daftar soal">
+        <div className="flex items-end gap-5">
+          <TabLink href={hrefAll} active={mode === "all"} label="Semua" />
+          <TabLink
+            href={hrefBookmarked}
+            active={mode === "bookmarked"}
+            label={`Tersimpan (${bookmarks.count})`}
+          />
+          <TabLink
+            href={hrefMastered}
+            active={mode === "mastered"}
+            label={`Dikuasai (${mastered.count})`}
+          />
+        </div>
+        {mode !== "all" && shown.length > 0 && (
+          <p className="pb-2 text-xs text-fg-soft">
+            {shown.length} dari {total}
           </p>
         )}
       </div>
 
       {shown.length === 0 ? (
-        <div className="px-1">{empty}</div>
+        empty
       ) : (
-        <ul className="card lines">
+        <ul className="border-b border-border">
           {shown.map((item) => (
             <QuestionListItem
               key={item.id}

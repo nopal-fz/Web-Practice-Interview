@@ -1,27 +1,20 @@
 "use client";
 
-import { useState, type ReactNode } from "react";
+import { useState } from "react";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
 import { Markdown } from "@/components/markdown";
 import { difficultyLabels, difficultyStyles, titleize } from "@/lib/format";
 import { roleLabel } from "@/lib/roles";
 import type { QuestionListItem as QuizQuestion } from "@/lib/questions";
 
 const DIFFICULTIES = [
-  { value: undefined as string | undefined, label: "Semua tingkat" },
+  { value: "", label: "Semua tingkat" },
   { value: "easy", label: "Mudah" },
   { value: "medium", label: "Sedang" },
   { value: "hard", label: "Sulit" },
 ];
 
-const COUNT_PRESETS = [
-  { value: 5, label: "5 soal" },
-  { value: 10, label: "10 soal" },
-  { value: 20, label: "20 soal" },
-  { value: 50, label: "50 soal" },
-  { value: undefined as number | undefined, label: "Semua" },
-];
+const COUNTS = [5, 10, 20, 50, 0];
 
 type Props = {
   questions: QuizQuestion[];
@@ -33,31 +26,6 @@ type Props = {
   count?: number;
 };
 
-function Chip({
-  active,
-  onClick,
-  children,
-}: {
-  active: boolean;
-  onClick: () => void;
-  children: ReactNode;
-}) {
-  return (
-    <button
-      type="button"
-      onClick={onClick}
-      aria-pressed={active}
-      className={`chip px-3 py-2 sm:py-1.5 ${
-        active
-          ? "border-[var(--accent-btn)] text-[var(--accent)]"
-          : "text-[var(--fg-muted)] hover:text-[var(--accent)]"
-      }`}
-    >
-      {children}
-    </button>
-  );
-}
-
 export function QuizShell({
   questions,
   roleOptions,
@@ -67,41 +35,32 @@ export function QuizShell({
   difficulty,
   count,
 }: Props) {
-  const router = useRouter();
-  const [selectedRole, setSelectedRole] = useState<string | undefined>(role);
-  const [selectedDifficulty, setSelectedDifficulty] = useState<string | undefined>(difficulty);
-  const [selectedCount, setSelectedCount] = useState<number | undefined>(count);
+  // Filters are a plain GET form, so the session is shareable and back/forward works.
   const [index, setIndex] = useState(0);
   const [open, setOpen] = useState(false);
   const [finished, setFinished] = useState(false);
 
-  function start() {
-    const params = new URLSearchParams();
-    if (selectedRole) params.set("role", selectedRole);
-    if (selectedDifficulty) params.set("difficulty", selectedDifficulty);
-    if (selectedCount) params.set("count", String(selectedCount));
-    router.push(`/quiz${params.size > 0 ? `?${params.toString()}` : ""}`);
-  }
-
   const inSession = requested && questions.length > 0 && !finished;
   const current = questions[index];
-  const done = (index: number) => String(index + 1).padStart(2, "0");
-  const totalDone = String(questions.length).padStart(2, "0");
 
   if (finished) {
     return (
-      <div className="mx-auto max-w-2xl space-y-5">
-        <p className="eyebrow">Sesi selesai</p>
-        <h1 className="font-display text-2xl font-semibold tracking-tight">Sesi latihan selesai.</h1>
-        <p className="max-w-xl text-sm leading-relaxed text-[var(--fg-muted)]">
-          {questions.length} soal diulang lewat flashcard. Sampai jumpa di sesi berikutnya.
+      <div className="space-y-4">
+        <h2 className="font-display text-xl font-semibold text-foreground">
+          {questions.length} soal selesai.
+        </h2>
+        <p className="text-sm leading-relaxed text-fg-muted">
+          Ulangi sesi yang sama untuk mengukur retensi, atau ganti filter untuk latihan baru.
         </p>
         <div className="flex flex-wrap gap-2">
-          <Link href={`/quiz?count=${questions.length}`} className="btn-primary px-4 py-3 sm:py-2">
-            Ulangi
+          <Link
+            href={`/?mode=latihan&quizCount=${questions.length}`}
+            className="btn-primary px-4 py-2 text-sm"
+          >
+            Ulangi sesi
           </Link>
-          <Link href="/quiz" className="btn-ghost px-4 py-3 sm:py-2">
-            Pilih ulang
+          <Link href="/?mode=latihan" className="btn-ghost px-4 py-2 text-sm">
+            Ganti filter
           </Link>
         </div>
       </div>
@@ -110,46 +69,41 @@ export function QuizShell({
 
   if (inSession && current) {
     return (
-      <div className="mx-auto max-w-2xl space-y-5">
-        <p className="eyebrow">
-          Sesi latihan · {done(index)} / {totalDone}
-        </p>
+      <div className="space-y-5">
+        <div className="flex items-center gap-4">
+          <span className="font-mono text-xs text-fg-muted">
+            {String(index + 1).padStart(2, "0")} / {questions.length}
+          </span>
+          <span className="h-px flex-1 bg-border" />
+        </div>
 
-        <article className="card overflow-hidden">
-          <div className="px-5 py-4 sm:px-6 sm:py-5">
-            <div className="flex flex-wrap items-center gap-2 text-xs">
-              <span className={difficultyStyles[current.difficulty] ?? "badge badge-muted"}>
-                {difficultyLabels[current.difficulty] ?? current.difficulty}
-              </span>
-              <span className="badge badge-muted">{roleLabel(current.role)}</span>
-              <span className="badge badge-muted">{titleize(current.category)}</span>
-            </div>
-            <h1 className="font-display mt-4 text-xl font-semibold tracking-tight leading-snug sm:text-2xl">
-              {current.question}
-            </h1>
-          </div>
+        <div className="flex flex-wrap items-center gap-2 text-xs">
+          <span className={difficultyStyles[current.difficulty] ?? "badge badge-muted"}>
+            {difficultyLabels[current.difficulty] ?? current.difficulty}
+          </span>
+          <span className="badge badge-muted">{roleLabel(current.role)}</span>
+          <span className="badge badge-muted">{titleize(current.category)}</span>
+        </div>
 
-          <div className="hairline flex items-center justify-between gap-3 px-5 py-3">
-            <span className="text-sm font-medium">Jawaban</span>
+        <h2 className="font-display text-xl font-semibold leading-snug text-foreground">
+          {current.question}
+        </h2>
+
+        <div className="border-t border-border pt-4">
+          {open ? (
+            <Markdown>{current.answer}</Markdown>
+          ) : (
             <button
               type="button"
-              onClick={() => setOpen((value) => !value)}
-              aria-expanded={open}
-              className="btn-ghost px-3 py-2 text-xs sm:py-1"
+              onClick={() => setOpen(true)}
+              className="btn-ghost px-4 py-2 text-sm"
             >
-              {open ? "Sembunyikan" : "Lihat jawaban"}
+              Lihat jawaban
             </button>
-          </div>
-          <div className={`answer-grid ${open ? "open" : ""}`}>
-            <div className="answer-inner">
-              <div className="px-5 py-4 sm:px-6">
-                <Markdown>{current.answer}</Markdown>
-              </div>
-            </div>
-          </div>
-        </article>
+          )}
+        </div>
 
-        <div className="flex items-center justify-between gap-2">
+        <div className="flex items-center justify-between gap-3 border-t border-border pt-4">
           <button
             type="button"
             onClick={() => {
@@ -157,16 +111,12 @@ export function QuizShell({
               setOpen(false);
             }}
             disabled={index === 0}
-            className="btn-ghost px-4 py-3 text-sm sm:py-2 disabled:opacity-40"
+            className="btn-ghost px-4 py-2 text-sm disabled:opacity-40"
           >
             Sebelumnya
           </button>
           {index === questions.length - 1 ? (
-            <button
-              type="button"
-              onClick={() => setFinished(true)}
-              className="btn-primary px-4 py-3 sm:py-2"
-            >
+            <button type="button" onClick={() => setFinished(true)} className="btn-primary px-4 py-2 text-sm">
               Selesai
             </button>
           ) : (
@@ -176,7 +126,7 @@ export function QuizShell({
                 setIndex((value) => value + 1);
                 setOpen(false);
               }}
-              className="btn-primary px-4 py-3 sm:py-2"
+              className="btn-primary px-4 py-2 text-sm"
             >
               Berikutnya
             </button>
@@ -187,78 +137,64 @@ export function QuizShell({
   }
 
   return (
-    <div className="mx-auto max-w-2xl space-y-6">
-      <div className="space-y-1">
-        <p className="eyebrow">Sesi latihan</p>
-        <h1 className="font-display text-2xl font-semibold tracking-tight">
-          Buat sesi latihanmu.
-        </h1>
-        <p className="max-w-xl text-sm leading-relaxed text-[var(--fg-muted)]">
-          {total} soal tersedia. Pilih role, tingkat kesulitan, dan jumlah soal, lalu mulai
-          flashcard-nya.
-        </p>
-      </div>
+    <div className="space-y-5">
+      <p className="text-sm leading-relaxed text-fg-muted">
+        {total} soal tersedia. Jawab sendiri dulu, baru buka pembahasan.
+      </p>
 
       {requested && questions.length === 0 && (
-        <div className="panel px-5 py-4 text-sm text-[var(--fg-muted)]">
-          Belum ada soal yang cocok dengan pilihan ini. Coba longgarkan filternya.
-        </div>
+        <p className="text-sm text-fg-soft">Tidak ada soal yang cocok. Longgarkan filter.</p>
       )}
 
-      <div className="card space-y-5 p-5 sm:p-6">
-        <div className="space-y-2">
-          <p className="text-xs font-medium text-[var(--fg-muted)]">Role</p>
-          <div className="flex flex-wrap gap-2">
-            <Chip active={selectedRole === undefined} onClick={() => setSelectedRole(undefined)}>
-              Semua role
-            </Chip>
-            {roleOptions.map((roleOption) => (
-              <Chip
-                key={roleOption.value}
-                active={selectedRole === roleOption.value}
-                onClick={() => setSelectedRole(roleOption.value)}
-              >
-                {roleLabel(roleOption.value)}
-                <span className="tabular-nums text-[var(--fg-soft)]">{roleOption.count}</span>
-              </Chip>
-            ))}
-          </div>
+      <form action="/?mode=latihan" className="space-y-4">
+        <div className="grid gap-3 sm:grid-cols-3">
+          <label className="flex flex-col gap-1.5 text-xs font-medium text-fg-muted">
+            Peran
+            <select name="quizRole" defaultValue={role ?? ""} className="field px-3 py-2 text-sm">
+              <option value="">Semua peran</option>
+              {roleOptions.map((roleOption) => (
+                <option key={roleOption.value} value={roleOption.value}>
+                  {roleLabel(roleOption.value)} ({roleOption.count})
+                </option>
+              ))}
+            </select>
+          </label>
+
+          <label className="flex flex-col gap-1.5 text-xs font-medium text-fg-muted">
+            Kesulitan
+            <select
+              name="quizDifficulty"
+              defaultValue={difficulty ?? ""}
+              className="field px-3 py-2 text-sm"
+            >
+              {DIFFICULTIES.map((d) => (
+                <option key={d.value} value={d.value}>
+                  {d.label}
+                </option>
+              ))}
+            </select>
+          </label>
+
+          <label className="flex flex-col gap-1.5 text-xs font-medium text-fg-muted">
+            Jumlah soal
+            <select name="quizCount" defaultValue={String(count ?? 10)} className="field px-3 py-2 text-sm">
+              {COUNTS.map((n) => (
+                <option key={n} value={n === 0 ? "" : n}>
+                  {n === 0 ? "Semua" : n}
+                </option>
+              ))}
+            </select>
+          </label>
         </div>
 
-        <div className="space-y-2">
-          <p className="text-xs font-medium text-[var(--fg-muted)]">Tingkat kesulitan</p>
-          <div className="flex flex-wrap gap-2">
-            {DIFFICULTIES.map((d) => (
-              <Chip
-                key={d.label}
-                active={selectedDifficulty === d.value}
-                onClick={() => setSelectedDifficulty(d.value)}
-              >
-                {d.label}
-              </Chip>
-            ))}
-          </div>
-        </div>
-
-        <div className="space-y-2">
-          <p className="text-xs font-medium text-[var(--fg-muted)]">Jumlah soal</p>
-          <div className="flex flex-wrap gap-2">
-            {COUNT_PRESETS.map((c) => (
-              <Chip
-                key={c.label}
-                active={selectedCount === c.value}
-                onClick={() => setSelectedCount(c.value)}
-              >
-                {c.label}
-              </Chip>
-            ))}
-          </div>
-        </div>
-
-        <button type="button" onClick={start} className="btn-primary w-full px-4 py-3 sm:w-auto sm:py-2">
-          Mulai latihan
+        <button type="submit" className="btn-primary px-5 py-2 text-sm">
+          Mulai sesi
         </button>
-      </div>
+      </form>
+
+      <p className="text-xs text-fg-soft">
+        Sesi diacak dari soal yang cocok, jadi urutan berbeda tiap mulai.
+      </p>
     </div>
   );
 }

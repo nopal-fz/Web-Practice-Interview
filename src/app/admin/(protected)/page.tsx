@@ -13,7 +13,7 @@ export default async function AdminDashboardPage() {
       <div className="flex flex-wrap items-end justify-between gap-3">
         <div>
           <h1 className="font-display text-2xl font-semibold tracking-tight">Dashboard</h1>
-          <p className="text-sm text-[var(--fg-muted)]">
+          <p className="text-sm text-fg-muted">
             Total <span className="font-medium">{total}</span> soal di bank soal.
           </p>
         </div>
@@ -39,12 +39,12 @@ export default async function AdminDashboardPage() {
           <ul className="card lines">
             {roles.map((role) => (
               <li key={role.value} className="flex items-center justify-between px-4 py-2 text-sm">
-                <span className="text-[var(--fg-muted)]">{roleLabel(role.value)}</span>
-                <span className="tabular-nums text-[var(--fg-soft)]">{role.count}</span>
+                <span className="text-fg-muted">{roleLabel(role.value)}</span>
+                <span className="tabular-nums text-fg-soft">{role.count}</span>
               </li>
             ))}
             {roles.length === 0 && (
-              <li className="px-4 py-3 text-sm text-[var(--fg-soft)]">Belum ada data.</li>
+              <li className="px-4 py-3 text-sm text-fg-soft">Belum ada data.</li>
             )}
           </ul>
         </section>
@@ -57,12 +57,12 @@ export default async function AdminDashboardPage() {
                 key={category.value}
                 className="flex items-center justify-between px-4 py-2 text-sm"
               >
-                <span className="text-[var(--fg-muted)]">{titleize(category.value)}</span>
-                <span className="tabular-nums text-[var(--fg-soft)]">{category.count}</span>
+                <span className="text-fg-muted">{titleize(category.value)}</span>
+                <span className="tabular-nums text-fg-soft">{category.count}</span>
               </li>
             ))}
             {categories.length === 0 && (
-              <li className="px-4 py-3 text-sm text-[var(--fg-soft)]">Belum ada data.</li>
+              <li className="px-4 py-3 text-sm text-fg-soft">Belum ada data.</li>
             )}
           </ul>
         </section>

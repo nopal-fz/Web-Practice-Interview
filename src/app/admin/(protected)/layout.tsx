@@ -20,7 +20,7 @@ export default async function AdminLayout({ children }: { children: React.ReactN
             <Link
               key={link.href}
               href={link.href}
-              className="text-[var(--fg-muted)] underline-offset-2 hover:text-[var(--accent)] hover:underline"
+              className="text-fg-muted underline-offset-2 hover:text-accent-text hover:underline"
             >
               {link.label}
             </Link>
@@ -29,7 +29,7 @@ export default async function AdminLayout({ children }: { children: React.ReactN
         <form action={logout}>
           <button
             type="submit"
-            className="text-sm text-[var(--fg-soft)] underline-offset-2 hover:text-rose-500 hover:underline"
+            className="text-sm text-fg-soft underline-offset-2 hover:text-rose-500 hover:underline"
           >
             Keluar
           </button>

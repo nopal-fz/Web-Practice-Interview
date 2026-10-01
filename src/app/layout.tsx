@@ -1,104 +1,56 @@
 import type { Metadata } from "next";
-import Link from "next/link";
-import { Fraunces, Geist, Geist_Mono } from "next/font/google";
-import { ThemeToggle } from "@/components/theme-toggle";
-import { SITE_NAME, SITE_URL } from "@/lib/site";
+import { IBM_Plex_Mono, IBM_Plex_Sans, Space_Grotesk } from "next/font/google";
+import { TopBar } from "@/components/top-bar";
+import { SITE_URL } from "@/lib/site";
 import "./globals.css";
 
-const geistSans = Geist({
-  variable: "--font-geist-sans",
+const display = Space_Grotesk({
+  variable: "--font-space-grotesk",
   subsets: ["latin"],
+  weight: ["500", "600", "700"],
 });
 
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
+const sans = IBM_Plex_Sans({
+  variable: "--font-plex-sans",
   subsets: ["latin"],
+  weight: ["400", "500", "600"],
 });
 
-const fraunces = Fraunces({
-  variable: "--font-fraunces",
+const mono = IBM_Plex_Mono({
+  variable: "--font-plex-mono",
   subsets: ["latin"],
+  weight: ["400", "500"],
 });
 
 export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),
   title: {
-    default: SITE_NAME,
-    template: "%s | Bank Soal Interview",
+    default: "LearnML: Soal Interview Machine Learning & AI",
+    template: "%s | LearnML",
   },
   description:
-    "Kumpulan soal interview Data Scientist, AI Engineer, dan ML Engineer, lengkap dengan jawaban untuk latihan mandiri.",
-  openGraph: {
-    type: "website",
-    locale: "id_ID",
-    siteName: SITE_NAME,
-    title: `${SITE_NAME}: latihan soal wawancara data & AI`,
-    description:
-      "Soal dan pembahasan interview untuk Data Scientist, AI Engineer, dan ML Engineer. Baca soal, jawab sendiri, lalu bandingkan.",
-    url: SITE_URL,
-  },
-  twitter: {
-    card: "summary",
-    title: SITE_NAME,
-    description:
-      "Soal dan pembahasan interview untuk Data Scientist, AI Engineer, dan ML Engineer.",
-  },
+    "Soal interview Machine Learning, Deep Learning, dan AI Engineer, lengkap dengan pembahasan dan kode.",
 };
 
-const themeInit = `(function(){try{var t=localStorage.getItem("theme");var dark=t==="dark"||(!t&&window.matchMedia("(prefers-color-scheme: dark)").matches);if(dark)document.documentElement.classList.add("dark");}catch(e){}})();`;
+// Applies data-theme before first paint so a light-mode user never sees a dark flash.
+// Deliberately a plain <script> in <head> rather than a component: a <script> rendered
+// from inside a React component is never executed on the client.
+const themeScript = `(function(){try{var t=localStorage.getItem("theme");if(t==="light"||t==="dark")document.documentElement.setAttribute("data-theme",t)}catch(e){}})()`;
 
 export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
     <html
       lang="id"
+      data-theme="dark"
+      className={`${display.variable} ${sans.variable} ${mono.variable}`}
       suppressHydrationWarning
-      className={`${geistSans.variable} ${geistMono.variable} ${fraunces.variable} h-full antialiased`}
     >
       <head>
-        <script dangerouslySetInnerHTML={{ __html: themeInit }} />
+        <script dangerouslySetInnerHTML={{ __html: themeScript }} />
       </head>
-      <body className="flex min-h-full flex-col">
-        <header className="border-b border-[var(--border)]">
-          <div className="mx-auto flex w-full max-w-5xl items-center justify-between gap-4 px-4 py-3">
-            <Link href="/" className="flex items-baseline gap-1.5">
-              <span className="font-display text-base font-semibold tracking-tight">
-                Bank Soal
-              </span>
-              <span className="text-sm font-medium italic text-[var(--accent)]">
-                Interview.
-              </span>
-            </Link>
-            <nav className="flex items-center gap-1 text-sm sm:gap-3">
-              <Link
-                href="/questions"
-                className="rounded-md px-3 py-2 text-gray-600 hover:text-[var(--accent)] dark:text-zinc-300 sm:py-0"
-              >
-                Semua soal
-              </Link>
-              <Link
-                href="/quiz"
-                className="rounded-md px-3 py-2 text-gray-600 hover:text-[var(--accent)] dark:text-zinc-300 sm:py-0"
-              >
-                Latihan
-              </Link>
-              <Link
-                href="/admin"
-                className="rounded-md px-3 py-2 text-gray-600 hover:text-[var(--accent)] dark:text-zinc-300 sm:py-0"
-              >
-                Admin
-              </Link>
-              <ThemeToggle />
-            </nav>
-          </div>
-        </header>
-
-        <main className="mx-auto w-full max-w-5xl flex-1 px-4 py-8">{children}</main>
-
-        <footer className="border-t border-[var(--border)]">
-          <div className="mx-auto w-full max-w-5xl px-4 py-6 text-xs text-[var(--fg-soft)]">
-            Latihan soal interview untuk Data Scientist, AI Engineer, dan ML Engineer.
-          </div>
-        </footer>
+      <body className="min-h-screen bg-background text-foreground antialiased">
+        <TopBar />
+        <main className="mx-auto max-w-3xl px-4 pb-20 pt-10 sm:px-6">{children}</main>
       </body>
     </html>
   );
