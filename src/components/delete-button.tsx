@@ -10,7 +10,7 @@ export function DeleteButton({ label = "Hapus" }: { label?: string }) {
         }
       }}
       className="min-h-[40px] px-2 py-2 text-sm underline underline-offset-2 transition-colors"
-      style={{ color: "var(--danger)" }}
+      style={{ color: "var(--hardt)" }}
     >
       {label}
     </button>

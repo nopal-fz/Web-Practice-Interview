@@ -46,7 +46,7 @@ export function ImportForm() {
         <p
           role="alert"
           className="rounded border px-3 py-2 text-sm text-fg"
-          style={{ borderColor: "var(--danger)", background: "var(--badge-hard-bg)" }}
+          style={{ borderColor: "var(--hardt)", background: "var(--hard)" }}
         >
           {state.error}
         </p>

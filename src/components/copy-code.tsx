@@ -20,8 +20,8 @@ export function CopyCode({ code }: { code: string }) {
       type="button"
       onClick={handleCopy}
       aria-live="polite"
-      className={`inline-flex min-h-[40px] items-center gap-1.5 rounded px-2.5 text-xs font-medium transition-colors ${
-        copied ? "text-[var(--success)]" : "text-fg-muted hover:text-accent-text"
+      className={`inline-flex min-h-[40px] items-center gap-1.5 rounded-lg px-2.5 text-xs font-bold transition-colors ${
+        copied ? "text-[var(--okt)]" : "text-fg-muted hover:text-ink"
       }`}
     >
       {copied ? <CheckIcon className="size-3.5" /> : <CopyIcon className="size-3.5" />}

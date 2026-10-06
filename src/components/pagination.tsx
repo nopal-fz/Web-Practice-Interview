@@ -16,11 +16,12 @@ export function Pagination({
   const numbers = Array.from({ length: end - start + 1 }, (_, index) => start + index);
 
   const idle =
-    "inline-flex min-h-[40px] items-center rounded border border-border px-3 py-1.5 text-sm text-fg-muted transition-colors hover:border-primary-accent hover:text-foreground";
-  const active = "inline-flex min-h-[40px] items-center rounded border border-primary-accent bg-primary-accent px-3 py-1.5 text-sm text-white";
+    "inline-flex min-h-[44px] items-center rounded-full border-2 border-line px-5 py-2 font-bold text-mut transition-colors hover:border-pri hover:text-ink";
+  const active =
+    "inline-flex min-h-[44px] items-center rounded-full border-2 border-pri bg-pri-fill px-5 py-2 font-bold text-white";
 
   return (
-    <nav className="flex flex-wrap items-center justify-center gap-1.5" aria-label="Navigasi halaman">
+    <nav className="flex flex-wrap items-center justify-center gap-2" aria-label="Navigasi halaman">
       {page > 1 && (
         <Link href={hrefFor(page - 1)} className={idle}>
           Sebelumnya

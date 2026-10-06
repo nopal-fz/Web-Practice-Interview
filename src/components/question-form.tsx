@@ -3,6 +3,7 @@
 import { useActionState, useState } from "react";
 import { saveQuestion } from "@/app/admin/actions";
 import { Markdown } from "@/components/markdown";
+import { FIELD_LIMITS } from "@/lib/format";
 
 export type EditableQuestion = {
   id: string;
@@ -41,6 +42,7 @@ export function QuestionForm({
             name="role"
             list="role-options"
             required
+            maxLength={FIELD_LIMITS.role}
             defaultValue={question?.role}
             placeholder="data-scientist"
             className={fieldClass}
@@ -59,6 +61,7 @@ export function QuestionForm({
             name="category"
             list="category-options"
             required
+            maxLength={FIELD_LIMITS.category}
             defaultValue={question?.category}
             placeholder="statistics"
             className={fieldClass}
@@ -82,7 +85,7 @@ export function QuestionForm({
 
       <label className="flex flex-col gap-1 text-sm font-medium text-fg-muted">
         Pertanyaan
-        <textarea name="question" required rows={2} defaultValue={question?.question} className={fieldClass} />
+        <textarea name="question" required rows={2} maxLength={FIELD_LIMITS.question} defaultValue={question?.question} className={fieldClass} />
       </label>
 
       <label className="flex flex-col gap-1 text-sm font-medium text-fg-muted">
@@ -90,6 +93,7 @@ export function QuestionForm({
         <input
           type="text"
           name="tags"
+          maxLength={FIELD_LIMITS.tags}
           defaultValue={question?.tags}
           placeholder="query, aggregation, window-function"
           className={fieldClass}
@@ -117,6 +121,7 @@ export function QuestionForm({
             name="answer"
             required
             rows={12}
+            maxLength={FIELD_LIMITS.answer}
             value={answer}
             onChange={(event) => setAnswer(event.target.value)}
             className={`${fieldClass} w-full font-mono`}
@@ -128,7 +133,7 @@ export function QuestionForm({
         <p
           role="alert"
           className="rounded border px-3 py-2 text-sm text-fg"
-          style={{ borderColor: "var(--danger)", background: "var(--badge-hard-bg)" }}
+          style={{ borderColor: "var(--hardt)", background: "var(--hard)" }}
         >
           {state.error}
         </p>

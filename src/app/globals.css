@@ -1,304 +1,381 @@
 @import "tailwindcss";
 
-/* Dark is the default: developer-tooling context, matches the audience.
-   Light is an explicit override on [data-theme="light"]. */
+/* Palette from reference/landing-soal-interview.html, light values only.
+   Single palette: no dark override and no prefers-color-scheme branch, so the
+   page renders identically for everyone regardless of OS setting.
+   Two blue tokens because they do different jobs: --pri is text and needs
+   contrast against --bg, --pri-fill is a button background and needs contrast
+   against white text. On this palette one value covers both (6.4:1). */
 :root {
-  --background: #0d1117;
-  --foreground: #e6e8eb;
-  --surface: #151b23;
-  --surface-muted: #1c212b;
-  --border: #262c36;
-  --border-strong: #363d4a;
+  --bg: #fbfcff;
+  --ink: #0a1433;
+  --mut: #4a5578;
+  --pri: #2347f5;
+  --pri-fill: #2347f5;
+  --pri-fill-hover: #1a35c4;
+  --line: #dfe5f5;
+  --soft: #eef2ff;
+  --hl: #d6f55b;
+  --lime: #d6f55b;
 
-  --fg: #e6e8eb;
-  --fg-muted: #8b93a1;
-  /* Bumped from #636B78: the spec value failed WCAG AA on #0D1117 (3.6:1). */
-  --fg-soft: #7c8494;
+  --ok: #dcfce7;
+  --okt: #166534;
+  --mid: #fef3c7;
+  --midt: #92400e;
+  --hard: #fee2e2;
+  --hardt: #991b1b;
 
-  /* Fills vs text-on-surface need separate values per theme: violet at 3.9:1
-     on the dark base is fine for a button fill but not for link text. */
-  --accent: #6e56cf;
-  --accent-text: #9d8bea;
-  --accent-contrast: #ffffff;
-  --amber: #e8a33d;
-  --amber-text: #e8a33d;
-  --domain-blue: #3b82f6;
-  --domain-blue-text: #60a5fa;
+  --code-bg: #eef2ff;
+  --code-fg: #0a1433;
 
-  --badge-easy-bg: rgba(59, 130, 246, 0.14);
-  --badge-easy-fg: #8ab6f8;
-  --badge-easy-border: rgba(59, 130, 246, 0.38);
-
-  --badge-medium-bg: rgba(232, 163, 61, 0.14);
-  --badge-medium-fg: #f2b95c;
-  --badge-medium-border: rgba(232, 163, 61, 0.38);
-
-  --badge-hard-bg: rgba(239, 68, 68, 0.14);
-  --badge-hard-fg: #f28b8b;
-  --badge-hard-border: rgba(239, 68, 68, 0.38);
-
-  --danger: #f87171;
-  --success: #4ade80;
-
-  --hljs-bg: #11161e;
-  --code-fg: #c9d1d9;
-}
-
-[data-theme="light"] {
-  --background: #f7f7f8;
-  --foreground: #16161a;
-  --surface: #ffffff;
-  --surface-muted: #f0f0f2;
-  --border: #e2e2e5;
-  --border-strong: #c9c9cf;
-
-  --fg: #16161a;
-  --fg-muted: #55555f;
-  --fg-soft: #6b6b76;
-
-  --accent: #5b3fd6;
-  --accent-text: #5334cc;
-  --accent-contrast: #ffffff;
-  --amber: #b5791a;
-  --amber-text: #8f5c0c;
-  --domain-blue: #2563eb;
-  --domain-blue-text: #1d4ed8;
-
-  --badge-easy-bg: rgba(37, 99, 235, 0.09);
-  --badge-easy-fg: #1d4ed8;
-  --badge-easy-border: rgba(37, 99, 235, 0.3);
-
-  --badge-medium-bg: rgba(143, 92, 12, 0.09);
-  --badge-medium-fg: #8f5c0c;
-  --badge-medium-border: rgba(143, 92, 12, 0.3);
-
-  --badge-hard-bg: rgba(185, 28, 28, 0.09);
-  --badge-hard-fg: #b91c1c;
-  --badge-hard-border: rgba(185, 28, 28, 0.3);
-
-  --danger: #b91c1c;
-  --success: #15803d;
-
-  --hljs-bg: #f4f4f6;
-  --code-fg: #1f2937;
+  /* Role domain colors for catalog pills. Separate from --pri: these encode
+     which career a question belongs to, --pri stays the one interactive accent. */
+  --role-ml: #1d4ed8;
+  --role-ai: #b45309;
+  --role-web: #6d28d9;
 }
 
 @theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --color-surface: var(--surface);
-  --color-surface-muted: var(--surface-muted);
-  --color-border: var(--border);
-  --color-border-strong: var(--border-strong);
-  --color-primary-accent: var(--accent);
-  --color-accent-text: var(--accent-text);
-  --color-secondary-accent: var(--amber);
-  --color-accent-blue: var(--domain-blue);
+  --color-bg: var(--bg);
+  --color-ink: var(--ink);
+  --color-mut: var(--mut);
+  --color-pri: var(--pri);
+  --color-pri-fill: var(--pri-fill);
+  --color-line: var(--line);
+  --color-soft: var(--soft);
+  --color-hl: var(--hl);
+  --color-lime: var(--lime);
+  --color-role-ml: var(--role-ml);
+  --color-role-ai: var(--role-ai);
+  --color-role-web: var(--role-web);
 
   --font-display: var(--font-space-grotesk), sans-serif;
-  --font-sans: var(--font-plex-sans), sans-serif;
-  --font-mono: var(--font-plex-mono), ui-monospace, SFMono-Regular, Menlo, monospace;
+  --font-sans: var(--font-figtree), system-ui, sans-serif;
+  --font-mono: ui-monospace, Menlo, Consolas, monospace;
+}
+
+* {
+  box-sizing: border-box;
 }
 
 html {
   scroll-behavior: smooth;
-  scroll-padding-top: 5rem;
+  /* Sole anchor offset: nav height (72) plus breathing room. Sections must not
+     also set scroll-margin-top, or the two offsets add up and the heading lands
+     far below the fold. */
+  scroll-padding-top: 96px;
 }
 
 body {
-  background-color: var(--background);
-  color: var(--foreground);
-  font-family: var(--font-plex-sans), sans-serif;
+  margin: 0;
+  background: var(--bg);
+  color: var(--ink);
+  font-family: var(--font-figtree), system-ui, sans-serif;
+  font-weight: 500;
+  line-height: 1.55;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
 
-::selection {
-  background: color-mix(in oklab, var(--accent) 25%, transparent);
+@layer base {
+  /* Must live in @layer base: unlayered rules outrank every layered rule, so a bare
+     `a { color: inherit }` here would beat `.btn { color: #fff }` in components. */
+  a {
+    color: inherit;
+    text-decoration: none;
+  }
+
+  ::selection {
+    background: var(--hl);
+    color: var(--ink);
+  }
+
+  :focus-visible {
+    outline: 3px solid var(--pri);
+    outline-offset: 3px;
+  }
 }
 
-:focus-visible {
-  outline: 2px solid var(--accent-text);
-  outline-offset: 2px;
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+  *,
+  *::before,
+  *::after {
+    transition: none !important;
+    animation: none !important;
+  }
 }
 
 @layer components {
-  /* 4px everywhere. Hierarchy comes from borders, never elevation (R-12). */
+  .wrap {
+    max-width: 1040px;
+    margin-inline: auto;
+    padding-inline: 24px;
+  }
+
+  .btn {
+    display: inline-block;
+    background: var(--pri-fill);
+    color: #fff;
+    font-family: var(--font-space-grotesk), sans-serif;
+    font-weight: 700;
+    font-size: 16px;
+    padding: 14px 28px;
+    border-radius: 999px;
+    text-align: center;
+    transition: background 150ms ease;
+  }
+  .btn:hover {
+    background: var(--pri-fill-hover);
+  }
+  .btn-sm {
+    padding: 10px 20px;
+    font-size: 14px;
+  }
+  .btn-lime {
+    background: var(--lime);
+    color: #0a1433;
+  }
+  .btn-lime:hover {
+    background: #fff;
+  }
+
   .card {
-    border: 1px solid var(--border);
-    background: var(--surface);
-    border-radius: 4px;
+    border: 2px solid var(--line);
+    border-radius: 20px;
+    background: var(--bg);
+    padding: 24px;
   }
 
-  .hairline {
-    border-bottom: 1px solid var(--border);
+  .lbl {
+    font-weight: 800;
+    font-size: 13px;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--mut);
   }
 
-  /* Stacked rows in a table/list: hairlines instead of elevation. */
-  .lines > * + * {
-    border-top: 1px solid var(--border);
+  /* Reversed two-column section: source order stays card-then-text for reading
+     order and screen readers, but the card sits right on wide screens. */
+  @media (min-width: 768px) {
+    .zig-rev > :first-child {
+      order: 2;
+    }
   }
 
   .field {
     width: 100%;
-    border: 1px solid var(--border);
-    background: var(--surface);
-    color: var(--foreground);
-    font-size: 0.875rem;
-    border-radius: 4px;
+    background: var(--bg);
+    color: var(--ink);
+    border: 2px solid var(--line);
+    border-radius: 999px;
+    font-size: 15px;
+    font-weight: 500;
+    padding: 16px 24px;
     transition: border-color 150ms ease;
   }
   .field::placeholder {
-    color: var(--fg-soft);
+    color: var(--mut);
+    opacity: 0.7;
   }
   .field:focus-visible {
     outline: none;
-    border-color: var(--accent);
+    border-color: var(--pri);
   }
 
-  .btn-primary {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    gap: 0.5rem;
-    min-height: 44px;
-    background: var(--accent);
-    color: var(--accent-contrast);
-    font-size: 0.875rem;
-    font-weight: 500;
-    border-radius: 4px;
-    transition: background-color 150ms ease;
-  }
-  .btn-primary:hover {
-    background: color-mix(in oklab, var(--accent) 85%, black);
-  }
-
-  .btn-ghost {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    gap: 0.5rem;
-    min-height: 44px;
-    border: 1px solid var(--border);
-    background: var(--surface);
-    color: var(--foreground);
-    font-size: 0.875rem;
-    border-radius: 4px;
-    transition: border-color 150ms ease;
-  }
-  .btn-ghost:hover {
-    border-color: var(--accent);
+  select.field {
+    border-radius: 20px;
+    padding: 14px 20px;
   }
 
   .badge {
-    display: inline-flex;
-    align-items: center;
-    padding: 0.125rem 0.5rem;
-    font-size: 0.75rem;
-    font-weight: 500;
-    border: 1px solid transparent;
-    border-radius: 4px;
+    display: inline-block;
+    font-size: 12px;
+    font-weight: 800;
+    padding: 4px 10px;
+    border-radius: 999px;
+    white-space: nowrap;
   }
-  .badge-easy {
-    background: var(--badge-easy-bg);
-    color: var(--badge-easy-fg);
-    border-color: var(--badge-easy-border);
+  .badge-m {
+    background: var(--ok);
+    color: var(--okt);
   }
-  .badge-medium {
-    background: var(--badge-medium-bg);
-    color: var(--badge-medium-fg);
-    border-color: var(--badge-medium-border);
+  .badge-s {
+    background: var(--mid);
+    color: var(--midt);
   }
-  .badge-hard {
-    background: var(--badge-hard-bg);
-    color: var(--badge-hard-fg);
-    border-color: var(--badge-hard-border);
+  .badge-h {
+    background: var(--hard);
+    color: var(--hardt);
   }
-  .badge-muted {
-    background: var(--surface-muted);
-    color: var(--fg-muted);
-    border-color: var(--border);
+  .badge-soft {
+    background: var(--soft);
+    color: var(--mut);
   }
 
-  /* Theme icons swap on the data-theme attribute the inline script sets, so the
-     toggle needs no client state and cannot cause a hydration mismatch. */
-  .theme-icon-light {
-    display: none;
-  }
-  [data-theme="light"] .theme-icon-dark {
-    display: none;
-  }
-  [data-theme="light"] .theme-icon-light {
-    display: block;
-  }
-
-  /* Chips are the only full-radius element: inline topic selectors. */
-  .chip {
-    display: inline-flex;
-    align-items: center;
-    gap: 0.375rem;
-    min-height: 36px;
-    border: 1px solid var(--border);
-    background: var(--surface);
-    color: var(--fg-muted);
-    font-size: 0.8125rem;
-    border-radius: 9999px;
+  .pill {
+    display: inline-block;
+    border: 2px solid var(--line);
+    border-radius: 999px;
+    padding: 12px 22px;
+    font-weight: 800;
     transition: border-color 150ms ease, color 150ms ease;
   }
-  .chip:hover {
-    border-color: var(--accent);
-    color: var(--foreground);
-  }
-  .chip[aria-current="true"],
-  .chip[aria-pressed="true"] {
-    border-color: var(--accent);
-    background: color-mix(in oklab, var(--accent) 12%, transparent);
-    color: var(--accent-text);
+  .pill:hover {
+    border-color: var(--pri);
+    color: var(--pri);
   }
 
-  .eyebrow {
-    font-family: var(--font-plex-mono), monospace;
-    font-size: 0.75rem;
-    color: var(--fg-muted);
+  /* Compact variant for filter rows, where the full pill is too tall to wrap. */
+  .pill-sm {
+    padding: 10px 20px;
   }
 
+  /* Filled state for the neutral "Semua peran" pill. Role pills get their own
+     fill from --role-c instead. */
+  .pill-on {
+    background: var(--ink);
+    border-color: var(--ink);
+    color: var(--bg);
+  }
+
+  /* Expand/collapse without a JS-driven height: rows animate, answers just
+     toggle, so nothing has to measure itself. */
+  .answer-grid {
+    display: grid;
+    grid-template-rows: 0fr;
+    transition: grid-template-rows 250ms cubic-bezier(0.4, 0, 0.2, 1);
+  }
+  .answer-grid.open {
+    grid-template-rows: 1fr;
+  }
+  .answer-inner {
+    overflow: hidden;
+    min-height: 0;
+  }
+
+  .chev {
+    width: 10px;
+    height: 10px;
+    border-right: 2px solid var(--pri);
+    border-bottom: 2px solid var(--pri);
+    transform: rotate(45deg);
+    flex: none;
+    margin-top: 6px;
+    transition: transform 150ms ease;
+  }
+  [open] > summary .chev {
+    transform: rotate(-135deg);
+  }
+
+  /* Role pills. Three domain colors, all clear AA (>=4.5:1) against white text,
+     so a selected pill is filled and a role stays readable when it is not.
+     --role-c is set by .pill-ml / .pill-ai / .pill-web, then read once here. */
+  .pill-ml {
+    --role-c: var(--role-ml);
+  }
+  .pill-ai {
+    --role-c: var(--role-ai);
+  }
+  .pill-web {
+    --role-c: var(--role-web);
+  }
+
+  .pill-role {
+    border-color: var(--line);
+    color: var(--ink);
+    transition:
+      background 150ms ease,
+      border-color 150ms ease,
+      color 150ms ease;
+  }
+  .pill-role:hover {
+    border-color: var(--role-c);
+    color: var(--role-c);
+  }
+  .pill-role[aria-pressed="true"] {
+    background: var(--role-c);
+    border-color: var(--role-c);
+    color: #fff;
+  }
+
+  /* Aliases for the admin console, which was written against the previous
+     naming. Keeps that tool readable while it shares the new palette. */
+  .text-fg {
+    color: var(--ink);
+  }
+  .text-fg-muted {
+    color: var(--mut);
+  }
+  .text-fg-soft {
+    color: var(--mut);
+    opacity: 0.8;
+  }
+  .font-display {
+    font-family: var(--font-space-grotesk), sans-serif;
+  }
+  .hairline {
+    border-bottom: 2px solid var(--line);
+  }
+  .lines > * + * {
+    border-top: 1px solid var(--line);
+  }
   .link-accent {
-    color: var(--accent-text);
-    text-underline-offset: 3px;
+    color: var(--pri);
+    font-weight: 700;
   }
   .link-accent:hover {
     text-decoration: underline;
   }
-
-  /* Role chip row scrolls instead of wrapping on narrow screens. */
-  .role-scroller {
-    overflow-x: auto;
-    scrollbar-width: none;
+  .eyebrow {
+    font-weight: 800;
+    font-size: 13px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--mut);
   }
-  .role-scroller::-webkit-scrollbar {
-    display: none;
+  .btn-primary {
+    background: var(--pri-fill);
+    color: #fff;
+    border-radius: 999px;
+    font-weight: 700;
+    transition: background 150ms ease;
   }
-
-  .answer-grid {
-    display: grid;
-    grid-template-rows: 0fr;
-    opacity: 0;
-    transition: grid-template-rows 250ms cubic-bezier(0.4, 0, 0.2, 1), opacity 180ms ease;
+  .btn-primary:hover {
+    background: var(--pri-fill-hover);
   }
-  .answer-grid.open {
-    grid-template-rows: 1fr;
-    opacity: 1;
+  .btn-ghost {
+    border: 2px solid var(--line);
+    border-radius: 999px;
+    color: var(--ink);
+    font-weight: 700;
+    transition: border-color 150ms ease;
   }
-  .answer-grid > .answer-inner {
-    overflow: hidden;
-    min-height: 0;
+  .btn-ghost:hover {
+    border-color: var(--pri);
+  }
+  .field {
+    width: 100%;
+    background: var(--bg);
+    color: var(--ink);
+    border: 2px solid var(--line);
+    border-radius: 12px;
+    font-size: 15px;
+    font-weight: 500;
+    transition: border-color 150ms ease;
+  }
+  .field:focus-visible {
+    outline: none;
+    border-color: var(--pri);
   }
 }
 
 /* Markdown answers. Line length capped so long prose stays readable. */
 .prose-answer {
-  color: var(--foreground);
-  font-size: 0.9375rem;
+  color: var(--ink);
+  font-size: 15.5px;
   line-height: 1.7;
   overflow-wrap: break-word;
 }
@@ -310,8 +387,8 @@ body {
 .prose-answer h3,
 .prose-answer h4 {
   font-family: var(--font-space-grotesk), sans-serif;
-  font-weight: 600;
-  line-height: 1.3;
+  font-weight: 700;
+  line-height: 1.25;
   margin-top: 1.5em;
 }
 .prose-answer h1 {
@@ -330,7 +407,7 @@ body {
   max-width: 68ch;
 }
 .prose-answer a {
-  color: var(--accent-text);
+  color: var(--pri);
   text-underline-offset: 3px;
 }
 .prose-answer ul,
@@ -347,119 +424,80 @@ body {
   margin-top: 0.35em;
 }
 .prose-answer li::marker {
-  color: var(--fg-soft);
+  color: var(--mut);
 }
 .prose-answer strong {
-  font-weight: 600;
+  font-weight: 700;
 }
 .prose-answer blockquote {
-  border-left: 2px solid var(--border-strong);
+  border-left: 2px solid var(--line);
   padding-left: 0.9rem;
-  color: var(--fg-muted);
+  color: var(--mut);
 }
 .prose-answer table {
   width: 100%;
   border-collapse: collapse;
-  font-size: 0.875rem;
+  font-size: 0.9rem;
   display: block;
   overflow-x: auto;
 }
 .prose-answer th,
 .prose-answer td {
-  border: 1px solid var(--border);
+  border: 1px solid var(--line);
   padding: 0.4rem 0.6rem;
   text-align: left;
 }
 .prose-answer th {
-  background: var(--surface-muted);
-  font-weight: 500;
+  background: var(--soft);
+  font-weight: 700;
 }
 .prose-answer :not(pre) > code {
-  font-family: var(--font-plex-mono), monospace;
+  font-family: var(--font-mono);
   font-size: 0.85em;
-  background: var(--surface-muted);
-  border: 1px solid var(--border);
-  border-radius: 4px;
+  background: var(--soft);
+  border-radius: 6px;
   padding: 0.1em 0.35em;
-}
-.prose-answer img {
-  max-width: 100%;
-  border: 1px solid var(--border);
-  border-radius: 4px;
 }
 .prose-answer hr {
   border: 0;
-  border-top: 1px solid var(--border);
+  border-top: 1px solid var(--line);
 }
 
 .code-block {
-  border: 1px solid var(--border);
-  border-radius: 4px;
+  border: 2px solid var(--line);
+  border-radius: 16px;
   overflow: hidden;
-  background: var(--hljs-bg);
-  max-width: 100%;
+  background: var(--code-bg);
 }
 .code-block pre {
   overflow-x: auto;
-  padding: 0.9rem 1rem;
-  font-family: var(--font-plex-mono), monospace;
-  font-size: 0.8125rem;
+  padding: 1rem 1.1rem;
+  font-family: var(--font-mono);
+  font-size: 13.5px;
   line-height: 1.65;
   color: var(--code-fg);
+  font-weight: 500;
 }
 .code-block pre code {
   background: none;
-  border: 0;
   padding: 0;
   font-size: inherit;
 }
 
-@keyframes page-reveal {
-  0% {
-    opacity: 0;
-    transform: translateY(8px);
-  }
-  100% {
-    opacity: 1;
-    transform: translateY(0);
-  }
+.hljs-keyword,
+.hljs-built_in {
+  color: var(--pri);
+  font-weight: 700;
 }
-
-/* One pass on load. No scroll-triggered reveals anywhere (MOTION: 1). */
-.page-enter {
-  animation: page-reveal 350ms cubic-bezier(0.4, 0, 0.2, 1) forwards;
+.hljs-string,
+.hljs-title {
+  color: var(--okt);
 }
-
-@media (prefers-reduced-motion: reduce) {
-  html {
-    scroll-behavior: auto;
-  }
-  .page-enter,
-  .answer-grid,
-  .answer-grid > .answer-inner {
-    animation: none !important;
-    transition: none !important;
-  }
-  .answer-grid.open {
-    grid-template-rows: 1fr;
-    opacity: 1;
-  }
+.hljs-number,
+.hljs-literal {
+  color: var(--midt);
 }
-
-::-webkit-scrollbar {
-  width: 8px;
-  height: 8px;
-}
-::-webkit-scrollbar-track {
-  background: var(--background);
-}
-::-webkit-scrollbar-thumb {
-  background: var(--border-strong);
-  border-radius: 4px;
-}
-::-webkit-scrollbar-thumb:hover {
-  background: var(--fg-soft);
-}
-::-webkit-scrollbar-corner {
-  background: var(--background);
+.hljs-comment {
+  color: var(--mut);
+  font-style: italic;
 }

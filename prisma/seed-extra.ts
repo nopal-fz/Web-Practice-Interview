@@ -2,6 +2,9 @@ import "dotenv/config";
 import { PrismaBetterSqlite3 } from "@prisma/adapter-better-sqlite3";
 import { PrismaClient } from "../src/generated/prisma/client";
 import { extraQuestions } from "./data/extra-questions";
+import { companyCaseQuestions } from "./data/company-cases";
+
+const allQuestions = [...extraQuestions, ...companyCaseQuestions];
 
 async function main() {
   const adapter = new PrismaBetterSqlite3({
@@ -15,10 +18,10 @@ async function main() {
   });
   const existingTexts = new Set(existing.map((q) => q.question));
 
-  const toInsert = extraQuestions.filter((q) => !existingTexts.has(q.question));
+  const toInsert = allQuestions.filter((q) => !existingTexts.has(q.question));
 
   if (toInsert.length === 0) {
-    console.log(`Tidak ada soal baru: semua ${extraQuestions.length} sudah ada.`);
+    console.log(`Tidak ada soal baru: semua ${allQuestions.length} sudah ada.`);
   } else {
     // eslint-disable-next-line @typescript-eslint/no-unused-vars -- buang {source} sebelum insert, hanya untuk jejak source di file
     const data = toInsert.map(({ source: _source, ...question }) => question);

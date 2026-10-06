@@ -1,13 +1,16 @@
-# Bank Soal Interview
+# SoalML
 
-Aplikasi web berisi kumpulan soal interview untuk role Data Scientist, AI Engineer, dan ML
-Engineer. Semua soal bisa dibaca siapa saja; hanya admin yang bisa menambah, mengubah, menghapus,
+Kumpulan soal interview untuk role Data Scientist, AI Engineer, ML Engineer, dan role terkait.
+Semua soal bisa dibaca siapa saja; hanya admin yang bisa menambah, mengubah, menghapus,
 dan mengimpor soal secara massal.
 
 ## Fitur
 
-- Publik: daftar soal dengan filter role/topik/kesulitan/kata kunci, pencarian, pagination, dan
-  halaman detail per soal. Jawaban di-render dari markdown dan bisa dibuka/tutup.
+- Publik: katalog soal dengan filter peran (boleh pilih lebih dari satu)/topik/kesulitan/kata
+  kunci, pencarian, pagination, dan halaman detail per soal. Jawaban di-render dari markdown dan
+  bisa dibuka/tutup.
+- Mode latihan (`/soal?mode=latihan`): sesi soal diacak berdasarkan filter, jawab dulu sebelum
+  buka pembahasan.
 - Admin (`/admin`, login single user): dashboard statistik, CRUD soal, serta import massal dari
   file atau tempel data JSON/CSV.
 - Markdown didukung di jawaban (heading, list, tabel, code block, dan lainnya).
@@ -28,7 +31,8 @@ dan mengimpor soal secara massal.
 | Route                        | Akses   | Keterangan                          |
 | ---------------------------- | ------- | ----------------------------------- |
 | `/`                          | Publik  | Landing + pencarian                 |
-| `/questions`                 | Publik  | Daftar soal + filter & pagination   |
+| `/soal`                      | Publik  | Katalog soal + filter & pagination  |
+| `/soal?mode=latihan`         | Publik  | Mode latihan sesi acak              |
 | `/questions/[id]`            | Publik  | Detail soal + jawaban               |
 | `/admin/login`               | Publik  | Login admin                         |
 | `/admin`                     | Admin   | Dashboard statistik                 |

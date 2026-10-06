@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Soal Interview ML & AI</title>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&family=Figtree:wght@500;700;800&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#fbfcff;--ink:#0a1433;--mut:#4a5578;--pri:#2347f5;--pri-d:#1a35c4;--line:#dfe5f5;--soft:#eef2ff;--hl:#d6f55b;--lime:#d6f55b;--ok:#dcfce7;--okt:#166534;--mid:#fef3c7;--midt:#92400e;--hard:#fee2e2;--hardt:#991b1b;
+box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#0a1026;--ink:#eef2ff;--mut:#a9b4d6;--pri:#6f8bff;--pri-d:#4a66e8;--line:#222d55;--soft:#121b3d;--hl:#2b3fa3;--lime:#d6f55b;--ok:#12351f;--okt:#86efac;--mid:#3b2d0c;--midt:#fcd34d;--hard:#3d1518;--hardt:#fca5a5}}
+:root[data-theme="dark"]{--bg:#0a1026;--ink:#eef2ff;--mut:#a9b4d6;--pri:#6f8bff;--pri-d:#4a66e8;--line:#222d55;--soft:#121b3d;--hl:#2b3fa3;--lime:#d6f55b;--ok:#12351f;--okt:#86efac;--mid:#3b2d0c;--midt:#fcd34d;--hard:#3d1518;--hardt:#fca5a5}
+html{scroll-padding-top:env(safe-area-inset-top,0px);scroll-behavior:smooth}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:Figtree,system-ui,sans-serif;font-weight:500;line-height:1.55}
+a{color:inherit;text-decoration:none}
+.logo,h1,h2,h3,.btn,.stat b,summary{font-family:'Space Grotesk',Figtree,sans-serif}
+.wrap{max-width:1040px;margin:0 auto;padding:0 24px}
+nav{border-bottom:1px solid var(--line);background:var(--bg);position:sticky;top:env(safe-area-inset-top,0px);z-index:5}
+nav .wrap{display:flex;align-items:center;height:72px;gap:32px}
+.logo{font-weight:900;font-size:26px;color:var(--pri);letter-spacing:-.5px}
+nav .links{display:flex;gap:28px;font-weight:800;color:var(--mut)}
+nav .sp{flex:1}
+.btn{display:inline-block;background:var(--pri);color:#fff;font-weight:700;font-size:16px;padding:14px 28px;border-radius:999px;transition:background .15s}
+.btn:hover{background:var(--pri-d)}
+.btn.sm{padding:10px 20px;font-size:14px}
+:focus-visible{outline:3px solid var(--pri);outline-offset:3px}
+.hero{text-align:center;padding:88px 0 72px}
+h1{font-weight:900;font-size:clamp(44px,9vw,104px);line-height:.98;letter-spacing:-.03em;margin:0 0 28px;color:var(--ink)}
+h1 span{display:inline-block;padding:0 .12em;margin:0 -.12em;background:var(--hl);border-radius:.12em}
+.hero p{font-size:clamp(18px,2.4vw,24px);color:var(--mut);max-width:620px;margin:0 auto 40px}
+.lbl{font-weight:900;font-size:13px;letter-spacing:.14em;text-transform:uppercase;color:var(--mut);margin-bottom:12px}
+.claim{max-width:560px;margin:0 auto 28px;border:2px solid var(--line);border-radius:999px;padding:18px 26px;text-align:left;font:700 18px Figtree,sans-serif;color:var(--ink);background:var(--bg);width:100%}
+.claim::placeholder{color:var(--mut);opacity:.7}
+.small{margin-top:18px;color:var(--mut)}.small a{color:var(--pri);font-weight:900}
+.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;padding-bottom:88px}
+.stat{background:var(--soft);border-radius:20px;padding:24px;text-align:center}
+.stat b{display:block;font-size:44px;font-weight:900;color:var(--pri);line-height:1}
+.stat span{font-weight:800;color:var(--mut)}
+section{padding:72px 0}
+h2{font-weight:900;font-size:clamp(34px,5vw,56px);line-height:1.05;letter-spacing:-.02em;margin:0 0 16px}
+.sub{color:var(--mut);font-size:19px;max-width:560px;margin:0 0 40px}
+.zig{display:grid;grid-template-columns:1fr 1fr;gap:56px;align-items:center}
+.zig.rev>:first-child{order:2}
+.card{border:2px solid var(--line);border-radius:20px;background:var(--bg);padding:24px}
+.q{display:flex;gap:12px;align-items:center;padding:14px 0;border-bottom:1px solid var(--line);font-weight:800}
+.q:last-child{border:0}
+.badge{font-size:12px;font-weight:900;padding:4px 10px;border-radius:999px;white-space:nowrap}
+.m{background:var(--ok);color:var(--okt)}.s{background:var(--mid);color:var(--midt)}.h{background:var(--hard);color:var(--hardt)}
+.tier{border-radius:12px;padding:14px 16px;margin-bottom:10px;font-weight:700}
+.tier b{display:block;font-weight:900}
+.t1{background:var(--soft)}.t2{border:2px solid var(--line)}.t3{background:var(--ink);color:var(--bg)}
+pre{margin:0;font:700 14px/1.6 ui-monospace,Menlo,monospace;overflow-x:auto}
+.grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
+.grid .card h3{margin:0 0 6px;font-weight:900;font-size:20px}
+.grid .card p{margin:0;color:var(--mut)}
+.grid .card{transition:border-color .15s}.grid .card:hover{border-color:var(--pri)}
+.pills{display:flex;flex-wrap:wrap;gap:12px}
+.pill{border:2px solid var(--line);border-radius:999px;padding:12px 22px;font-weight:900}
+.faq{max-width:900px;margin:0 auto}
+.faq .lbl{color:var(--pri);margin-bottom:8px}
+details{border-bottom:1px solid var(--line)}details:first-of-type{border-top:1px solid var(--line)}
+summary{list-style:none;cursor:pointer;padding:24px 0;font-weight:700;font-size:19px;display:flex;justify-content:space-between;gap:16px}
+summary::-webkit-details-marker{display:none}
+summary::after{content:"";width:10px;height:10px;border-right:2px solid var(--pri);border-bottom:2px solid var(--pri);transform:rotate(45deg);flex:none;margin-top:6px;transition:transform .15s}
+details[open] summary::after{transform:rotate(-135deg)}
+details p{margin:0;padding:0 0 24px;color:var(--mut)}
+.cta{background:#2347f5;color:#fff;border-radius:28px;text-align:center;padding:64px 24px;margin:72px 0}
+.cta h2{color:#fff}.cta p{max-width:480px;margin:0 auto 32px;font-size:19px;opacity:.9}
+.cta .btn{background:var(--lime);color:#0a1433}.cta .btn:hover{background:#fff}
+footer{border-top:1px solid var(--line);padding:40px 0;color:var(--mut);font-weight:700}
+footer .wrap{display:flex;justify-content:space-between;flex-wrap:wrap;gap:16px}
+@media(max-width:760px){nav .links{display:none}.stats{grid-template-columns:1fr 1fr}.zig{grid-template-columns:1fr;gap:32px}.zig.rev>:first-child{order:0}.grid{grid-template-columns:1fr}.hero{padding-top:56px}}
+@media(prefers-reduced-motion:reduce){*{transition:none!important;scroll-behavior:auto!important}}
+</style>
+</head>
+<body>
+<nav><div class="wrap">
+<a class="logo" href="#">siap.interview</a>
+<div class="links"><a href="#topik">Topik</a><a href="#peran">Peran</a><a href="#faq">FAQ</a></div>
+<div class="sp"></div>
+<a class="btn sm" href="#">Mulai latihan</a>
+</div></nav>
+
+<main class="wrap">
+<div class="hero">
+<h1>Interview ML kamu<br><span>beres.</span></h1>
+<p>110 soal Machine Learning dan AI dengan pembahasan bertingkat: rumus, intuition, dan kode yang bisa langsung dijalankan.</p>
+<div class="lbl">Cari topik yang mau dilatih</div>
+<input class="claim" type="text" placeholder="contoh: A/B testing, class imbalance" aria-label="Cari topik">
+<a class="btn" href="#">Mulai latihan</a>
+</div>
+
+<div class="stats">
+<div class="stat"><b>110</b><span>soal</span></div>
+<div class="stat"><b>8</b><span>peran karier</span></div>
+<div class="stat"><b>3</b><span>level kesulitan</span></div>
+<div class="stat"><b>100%</b><span>Bahasa Indonesia</span></div>
+</div>
+
+<section class="zig" style="padding-top:0">
+<div>
+<h2>Satu soal, tiga lapis jawaban.</h2>
+<p class="sub">Mulai dari rumus, lanjut ke intuition, tutup dengan kode. Buka lapisan sesuai kebutuhanmu.</p>
+<a class="btn sm" href="#">Coba satu soal</a>
+</div>
+<div class="card">
+<div class="q" style="padding-top:0"><span class="badge s">Sedang</span>Jelaskan beda antara probability dan likelihood.</div>
+<div style="padding-top:16px">
+<div class="tier t1"><b>Rumus</b>P(data | θ) vs L(θ | data)</div>
+<div class="tier t2"><b>Intuition</b>Parameter tetap atau data tetap, mana yang kamu variasikan?</div>
+<div class="tier t3"><pre>from scipy.stats import norm
+norm.pdf(x, loc=mu, scale=sd)</pre></div>
+</div>
+</div>
+</section>
+
+<section class="zig rev">
+<div class="card">
+<div class="q" style="padding-top:0"><span class="badge m">Mudah</span>Beda north-star metric dan vanity metric</div>
+<div class="q"><span class="badge s">Sedang</span>Kapan lebih baik pakai PR-AUC daripada ROC-AUC?</div>
+<div class="q"><span class="badge h">Sulit</span>Cara menghitung ukuran sampel sebelum A/B test</div>
+<div class="q"><span class="badge s">Sedang</span>Apa risiko target encoding dan mitigasinya?</div>
+</div>
+<div>
+<h2>Pilih level, sesuaikan target.</h2>
+<p class="sub">Filter berdasarkan topik, kesulitan, atau peran yang kamu incar. Simpan soal yang penting, tandai yang sudah dikuasai.</p>
+<a class="btn sm" href="#">Lihat katalog</a>
+</div>
+</section>
+
+<section id="topik">
+<h2>Topik yang sering keluar.</h2>
+<p class="sub">Dari statistik dasar sampai MLOps, semua yang biasa ditanya di interview.</p>
+<div class="grid">
+<div class="card"><h3>Probabilitas</h3><p>Bernoulli, Binomial, likelihood.</p></div>
+<div class="card"><h3>A/B testing</h3><p>p-value, ukuran sampel, guardrail metrics.</p></div>
+<div class="card"><h3>Metrik produk</h3><p>North-star, vanity metric, trade-off.</p></div>
+<div class="card"><h3>Feature engineering</h3><p>Target encoding, leakage, mitigasi.</p></div>
+<div class="card"><h3>Evaluasi model</h3><p>ROC-AUC, PR-AUC, cross-validation.</p></div>
+<div class="card"><h3>Class imbalance</h3><p>Resampling, threshold, cost-sensitive.</p></div>
+</div>
+</section>
+
+<section id="peran">
+<h2>Latihan sesuai peran.</h2>
+<p class="sub">Soal dikelompokkan berdasarkan posisi yang kamu lamar.</p>
+<div class="pills">
+<span class="pill">Data Scientist</span><span class="pill">AI Engineer</span><span class="pill">ML Engineer</span><span class="pill">Backend Engineer</span><span class="pill">DevOps / MLOps</span><span class="pill">Data Engineer</span><span class="pill">AI Product Manager</span><span class="pill">Frontend / Fullstack</span>
+</div>
+</section>
+
+<section id="faq" class="faq">
+<div class="lbl">FAQ</div>
+<h2 style="margin-bottom:32px">Masih ada pertanyaan?</h2>
+<details><summary>Soalnya cocok buat level apa?</summary><p>Dari pemula sampai senior. Tiap soal ditandai Mudah, Sedang, atau Sulit, jadi kamu bisa mulai dari yang paling nyaman.</p></details>
+<details><summary>Apa isi pembahasannya?</summary><p>Tiga lapis: rumus, intuition, dan kode yang bisa langsung dijalankan.</p></details>
+<details><summary>Bisa difilter sesuai peran?</summary><p>Bisa. Pilih salah satu dari 8 peran, misalnya AI Engineer atau Data Scientist, lalu katalog menyesuaikan.</p></details>
+<details><summary>Gimana cara simpan soal?</summary><p>Tekan tombol simpan di tiap soal. Soal tersimpan dan yang sudah dikuasai punya tab sendiri.</p></details>
+<details><summary>Ada mode latihan?</summary><p>Ada. Tab Latihan bikin kamu menjawab dulu sebelum membuka pembahasan.</p></details>
+<details><summary>Gratis atau berbayar?</summary><p>Isi ini placeholder, ganti dengan model harga web kamu.</p></details>
+</section>
+
+<div class="cta">
+<h2>Siap interview, mulai dari satu soal.</h2>
+<p>Pilih topik, jawab, lalu bandingkan dengan pembahasan.</p>
+<a class="btn" href="#">Mulai latihan</a>
+</div>
+</main>
+
+<footer><div class="wrap"><span><b style="color:var(--pri)">siap.interview</b> &nbsp; Latihan interview ML dan AI.</span><span>© 2026</span></div></footer>
+</body>
+</html>

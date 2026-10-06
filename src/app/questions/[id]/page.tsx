@@ -2,10 +2,18 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import type { Metadata } from "next";
 import { AnswerCard } from "@/components/answer-card";
+import { TopBar } from "@/components/landing/top-bar";
+import { SiteFooter } from "@/components/landing/site-footer";
 import { SITE_NAME } from "@/lib/site";
-import { difficultyLabels, difficultyStyles, titleize } from "@/lib/format";
+import { difficultyLabels, titleize } from "@/lib/format";
 import { getQuestion } from "@/lib/questions";
 import { roleLabel } from "@/lib/roles";
+
+const LEVEL_CLASS: Record<string, string> = {
+  easy: "badge badge-m",
+  medium: "badge badge-s",
+  hard: "badge badge-h",
+};
 
 type Props = { params: Promise<{ id: string }> };
 
@@ -57,41 +65,46 @@ export default async function QuestionDetailPage({ params }: Props) {
   });
 
   return (
-    <article className="space-y-6">
-      <Link href="/" className="link-accent inline-block text-sm">
-        Kembali ke katalog soal
-      </Link>
+    <>
+      <TopBar />
+      <main className="wrap py-12">
+        <article className="max-w-[720px]">
+          <Link href="/soal" className="mb-6 inline-block font-extrabold text-pri">
+            &larr; Kembali ke katalog
+          </Link>
 
-      <header className="space-y-3">
-        <div className="flex flex-wrap items-center gap-2 text-xs">
-          <span className={difficultyStyles[question.difficulty] ?? "badge badge-muted"}>
-            {difficultyLabels[question.difficulty] ?? question.difficulty}
-          </span>
-          <span className="badge badge-muted">{roleLabel(question.role)}</span>
-          <span className="badge badge-muted">{titleize(question.category)}</span>
-        </div>
-        <h1 className="font-display text-2xl font-semibold leading-snug tracking-tight sm:text-3xl">
-          {question.question}
-        </h1>
-      </header>
+          <div className="mb-4 flex flex-wrap gap-2">
+            <span className={LEVEL_CLASS[question.difficulty] ?? "badge badge-soft"}>
+              {difficultyLabels[question.difficulty] ?? question.difficulty}
+            </span>
+            <span className="badge badge-soft">{roleLabel(question.role)}</span>
+            <span className="badge badge-soft">{titleize(question.category)}</span>
+          </div>
 
-      <AnswerCard answer={question.answer} />
+          <h1 className="mb-8 font-display text-[clamp(28px,4vw,44px)] font-bold leading-[1.15] tracking-[-0.02em]">
+            {question.question}
+          </h1>
 
-      {question.tags && (
-        <div className="flex flex-wrap gap-2 text-xs">
-          {question.tags
-            .split(",")
-            .map((tag) => tag.trim())
-            .filter(Boolean)
-            .map((tag) => (
-              <span key={tag} className="chip px-2 py-0.5">
-                #{tag}
-              </span>
-            ))}
-        </div>
-      )}
+          <AnswerCard answer={question.answer} />
 
-      <p className="text-xs text-fg-soft">Terakhir diperbarui {updated}</p>
-    </article>
+          {question.tags && (
+            <div className="mt-8 flex flex-wrap gap-2">
+              {question.tags
+                .split(",")
+                .map((tag) => tag.trim())
+                .filter(Boolean)
+                .map((tag) => (
+                  <span key={tag} className="pill !py-1.5 font-mono !text-xs">
+                    #{tag}
+                  </span>
+                ))}
+            </div>
+          )}
+
+          <p className="mt-8 text-sm text-mut">Terakhir diperbarui {updated}</p>
+        </article>
+      </main>
+      <SiteFooter />
+    </>
   );
 }

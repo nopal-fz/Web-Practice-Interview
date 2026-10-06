@@ -2,17 +2,16 @@ import Link from "next/link";
 
 export default function NotFound() {
   return (
-    <div className="mx-auto max-w-md space-y-4 py-12 text-center">
-      <h1 className="font-display text-xl font-semibold tracking-tight">Halaman tidak ditemukan</h1>
-      <p className="text-sm leading-relaxed text-fg-muted">
+    <main className="wrap flex min-h-screen flex-col items-center justify-center py-24 text-center">
+      <h1 className="mb-4 font-display text-[clamp(32px,5vw,56px)] font-bold leading-[1.05] tracking-[-0.02em]">
+        Halaman tidak ditemukan
+      </h1>
+      <p className="mb-8 max-w-[480px] text-[19px] text-mut">
         URL yang kamu tuju tidak tersedia, atau soalnya sudah dihapus.
       </p>
-      <Link
-        href="/"
-        className="btn-primary inline-flex px-4 py-3 sm:py-2"
-      >
+      <Link href="/" className="btn">
         Kembali ke beranda
       </Link>
-    </div>
+    </main>
   );
 }

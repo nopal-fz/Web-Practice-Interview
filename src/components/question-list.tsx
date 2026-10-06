@@ -19,18 +19,14 @@ type Props = {
   baseQuery: string;
 };
 
-// Underline tabs, not bordered pills: they sit directly on the list below, so they
-// read as one column rather than a row of buttons stacked on top of another.
 function TabLink({ href, active, label }: { href: string; active: boolean; label: string }) {
   return (
     <Link
       href={href}
       role="tab"
       aria-selected={active}
-      className={`-mb-px border-b-2 pb-2 text-sm transition-colors ${
-        active
-          ? "border-primary-accent text-foreground"
-          : "border-transparent text-fg-muted hover:text-foreground"
+      className={`-mb-0.5 border-b-4 pb-3 font-display text-lg font-bold transition-colors ${
+        active ? "border-pri text-ink" : "border-transparent text-mut hover:text-ink"
       }`}
     >
       {label}
@@ -60,7 +56,7 @@ export function QuestionList({
       : items;
 
   const hrefFor = (target: number) =>
-    `/?${baseQuery}${baseQuery ? "&" : ""}questionPage=${String(target)}`;
+    `/soal${baseQuery ? `?${baseQuery}&page=${target}` : `?page=${target}`}`;
 
   const empty =
     mode === "bookmarked" ? (
@@ -105,9 +101,9 @@ export function QuestionList({
     );
 
   return (
-    <div className="space-y-6">
-      <div className="flex items-end justify-between gap-4" role="tablist" aria-label="Daftar soal">
-        <div className="flex items-end gap-5">
+    <div className="space-y-8">
+      <div className="flex flex-wrap items-end justify-between gap-4" role="tablist" aria-label="Daftar soal">
+        <div className="flex gap-6">
           <TabLink href={hrefAll} active={mode === "all"} label="Semua" />
           <TabLink
             href={hrefBookmarked}
@@ -121,7 +117,7 @@ export function QuestionList({
           />
         </div>
         {mode !== "all" && shown.length > 0 && (
-          <p className="pb-2 text-xs text-fg-soft">
+          <p className="pb-3 text-sm text-mut">
             {shown.length} dari {total}
           </p>
         )}
@@ -130,7 +126,7 @@ export function QuestionList({
       {shown.length === 0 ? (
         empty
       ) : (
-        <ul className="border-b border-border">
+        <ul className="card !p-0">
           {shown.map((item) => (
             <QuestionListItem
               key={item.id}

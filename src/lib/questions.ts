@@ -24,7 +24,8 @@ export type QuestionListItem = {
 
 function buildWhere(filters: QuestionFilters): Prisma.QuestionWhereInput {
   const where: Prisma.QuestionWhereInput = {};
-  if (filters.role) where.role = filters.role;
+  // peran holds comma-separated slugs so more than one role can be picked at once.
+  if (filters.role) where.role = { in: filters.role.split(",").filter(Boolean) };
   if (filters.category) where.category = filters.category;
   if (filters.difficulty) where.difficulty = filters.difficulty;
   if (filters.q) {
@@ -111,11 +112,46 @@ function shuffle<T>(items: T[]): T[] {
   return a;
 }
 
+// Sample rows for the landing page, one per difficulty where possible so the
+// preview shows the full level range instead of five questions of the same level.
+//
+// ponytail: one bounded query per difficulty, not findMany() over the whole
+// table. The landing page runs on every visit, and loading every row (answers
+// included) to pick 3 made page cost scale with catalog size.
+export async function getSampleQuestions(count: number): Promise<QuestionListItem[]> {
+  const picked: QuestionListItem[] = [];
+
+  for (const difficulty of ["easy", "medium", "hard"]) {
+    if (picked.length >= count) break;
+    const [row] = await prisma.question.findMany({
+      where: { difficulty },
+      orderBy: { updatedAt: "desc" },
+      take: 1,
+    });
+    if (row) picked.push(row);
+  }
+
+  if (picked.length < count) {
+    // Top up with the newest remaining questions so a catalog without all three
+    // levels still shows something.
+    const rest = await prisma.question.findMany({
+      where: { difficulty: { notIn: picked.map((row) => row.difficulty) } },
+      orderBy: { updatedAt: "desc" },
+      take: count - picked.length,
+    });
+    picked.push(...rest);
+  }
+
+  return picked.slice(0, count);
+}
+
 export async function getQuizQuestions(
   filters: { role?: string; difficulty?: string; count?: number },
 ): Promise<QuestionListItem[]> {
   const where: Prisma.QuestionWhereInput = {};
-  if (filters.role) where.role = filters.role;
+  // Same comma-separated convention as buildWhere, so a role shared from the
+  // catalog (peran=a,b) also works here instead of matching nothing.
+  if (filters.role) where.role = { in: filters.role.split(",").filter(Boolean) };
   if (filters.difficulty) where.difficulty = filters.difficulty;
 
   const rows = await prisma.question.findMany({ where });

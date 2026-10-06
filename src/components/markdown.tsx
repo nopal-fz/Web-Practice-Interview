@@ -32,8 +32,8 @@ function textOf(nodes: ReactNode): string {
 function CodeBlock({ lang, children }: { lang?: string; children?: ReactNode }) {
   return (
     <div className="code-block">
-      <div className="flex items-center justify-between gap-3 border-b border-[var(--border)] px-4 py-1.5">
-        <span className="font-mono text-xs text-[var(--fg-soft)]">{lang ?? "code"}</span>
+      <div className="flex items-center justify-between gap-3 border-b border-line px-4 py-2">
+        <span className="font-mono text-xs text-mut">{lang ?? "code"}</span>
         <CopyCode code={textOf(children)} />
       </div>
       <pre>

@@ -14,6 +14,30 @@ const ROLE_LABELS: Record<string, string> = {
 // Urutan stabil supaya filter role dan tab admin tidak berubah urutan antar-request.
 const ROLE_ORDER = Object.keys(ROLE_LABELS);
 
+// Tiga warna domain, bukan delapan. Palais warna harus bisa dibaca tanpa dihafal,
+// jadi yang bewarna adalah kelompok karier, bukan tiap peran.
+const ROLE_DOMAIN: Record<string, "ml" | "ai" | "web"> = {
+  "data-scientist": "ml",
+  "ml-engineer": "ml",
+  "data-engineer": "ml",
+  "mlops-engineer": "ml",
+  "ai-engineer": "ai",
+  "ai-product-manager": "ai",
+  "backend-engineer": "web",
+  "frontend-fullstack-engineer": "web",
+};
+
+export function roleDomain(slug: string): "ml" | "ai" | "web" {
+  return ROLE_DOMAIN[slug] ?? "web";
+}
+
+// "ml" | "ai" | "web" -> kelas .pill-* yang menyetel --role-c.
+export const rolePillClass: Record<string, string> = {
+  ml: "pill-ml",
+  ai: "pill-ai",
+  web: "pill-web",
+};
+
 export function roleLabel(slug: string): string {
   return ROLE_LABELS[slug] ?? titleize(slug);
 }
