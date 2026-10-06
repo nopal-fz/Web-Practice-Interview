@@ -3,8 +3,9 @@ import { PrismaBetterSqlite3 } from "@prisma/adapter-better-sqlite3";
 import { PrismaClient } from "../src/generated/prisma/client";
 import { extraQuestions } from "./data/extra-questions";
 import { companyCaseQuestions } from "./data/company-cases";
+import { companyCaseQuestions2 } from "./data/company-cases-2";
 
-const allQuestions = [...extraQuestions, ...companyCaseQuestions];
+const allQuestions = [...extraQuestions, ...companyCaseQuestions, ...companyCaseQuestions2];
 
 async function main() {
   const adapter = new PrismaBetterSqlite3({
