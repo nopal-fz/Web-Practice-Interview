@@ -18,6 +18,25 @@ export const difficultyLabels: Record<string, string> = {
   hard: "Sulit",
 };
 
+// Publication state. draft is hidden from the public catalog but stays editable;
+// archived is what an admin "delete" now sets, so the row survives and can be
+// restored. Strings rather than a Prisma enum, matching role/category/difficulty,
+// so adding a state needs no migration.
+export const STATUSES = ["published", "draft", "archived"] as const;
+export type Status = (typeof STATUSES)[number];
+
+export const statusLabels: Record<string, string> = {
+  published: "Terbit",
+  draft: "Draf",
+  archived: "Arsip",
+};
+
+export function normalizeKeyConcepts(input: string): string {
+  // Same rules as normalizeTags: split on commas and semicolons, lowercase,
+  // drop blanks, dedupe. Newlines are already whitespace to trim().
+  return normalizeTags(input);
+}
+
 export function normalizeTags(input: string): string {
   return Array.from(
     new Set(
@@ -33,14 +52,16 @@ export function normalizeTags(input: string): string {
 // into SQLite: schema.prisma uses bare String and the forms set no maxLength,
 // so one request can store arbitrarily large rows.
 //
-// Headroom over the longest real row: role 27, category 19, question 227,
-// answer 2130, tags 81 chars.
+// Headroom over the longest real row, measured from dev.db: role 27,
+// category 19, question 256, answer 5596, tags 81 chars.
 export const FIELD_LIMITS = {
   role: 64,
   category: 64,
   question: 2000,
   answer: 100_000,
   tags: 500,
+  topic: 64,
+  keyConcepts: 500,
 } as const;
 
 const FIELD_LABEL: Record<keyof typeof FIELD_LIMITS, string> = {
@@ -49,6 +70,8 @@ const FIELD_LABEL: Record<keyof typeof FIELD_LIMITS, string> = {
   question: "pertanyaan",
   answer: "jawaban",
   tags: "tag",
+  topic: "bidang",
+  keyConcepts: "konsep kunci",
 };
 
 /** Returns an error message when any field is over its cap, else null. */
@@ -63,6 +86,18 @@ export function checkLengths(row: Partial<Record<keyof typeof FIELD_LIMITS, stri
     }
   }
   return null;
+}
+
+// Strips to slug-safe characters. Applied to role, category and topic before they
+// reach the database, so quotes, angle brackets and control characters cannot
+// survive into a value that ends up in a URL or a query.
+export function slugify(value: string, maxLength: number): string {
+  return value
+    .trim()
+    .toLowerCase()
+    .replace(/[^a-z0-9._-]+/g, "-")
+    .replace(/^-+|-+$/g, "")
+    .slice(0, maxLength);
 }
 
 export function buildQuery(params: Record<string, string | undefined>): string {

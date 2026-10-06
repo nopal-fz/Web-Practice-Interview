@@ -1,6 +1,7 @@
 import "dotenv/config";
 import { PrismaLibSql } from "@prisma/adapter-libsql";
 import { PrismaClient } from "../src/generated/prisma/client";
+import { applyTopicClassification } from "./topic-classification";
 
 type SeedQuestion = {
   role: string;
@@ -577,6 +578,14 @@ async function main() {
   } else {
     await prisma.question.createMany({ data: questions });
     console.log(`Seed selesai: ${questions.length} soal.`);
+  }
+
+  // Fresh rows arrive with topic="" and an empty rubric. Classify them here so a
+  // newly seeded database is not weaker than an existing one.
+  const problems = await applyTopicClassification(prisma);
+  if (problems.length > 0) {
+    console.log(`Peringatan: ${problems.length} soal belum terklasifikasi:`);
+    problems.forEach((line) => console.log(`  ${line}`));
   }
 
   await prisma.$disconnect();

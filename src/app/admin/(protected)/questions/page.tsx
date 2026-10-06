@@ -2,9 +2,17 @@ import Link from "next/link";
 import { deleteQuestion } from "@/app/admin/actions";
 import { DeleteButton } from "@/components/delete-button";
 import { Pagination } from "@/components/pagination";
-import { buildQuery, difficultyLabels, difficultyStyles, titleize } from "@/lib/format";
-import { getFilterOptions, getQuestions } from "@/lib/questions";
+import {
+  buildQuery,
+  difficultyLabels,
+  difficultyStyles,
+  statusLabels,
+  STATUSES,
+  titleize,
+} from "@/lib/format";
+import { getFilterOptions, getQuestions, getStats, getStatusCounts } from "@/lib/questions";
 import { roleLabel } from "@/lib/roles";
+import { topicLabel } from "@/lib/topics";
 
 export const metadata = { title: "Kelola soal" };
 
@@ -13,6 +21,7 @@ type SearchParams = Promise<{
   category?: string;
   difficulty?: string;
   q?: string;
+  status?: string;
   page?: string;
 }>;
 
@@ -23,6 +32,15 @@ function first(value: string | string[] | undefined): string | undefined {
 
 const selectClass = "field px-2 py-3 sm:py-1.5";
 
+// Archived rows are kept in the table so a soft delete is reversible, which
+// means they need a label that reads differently from a live row rather than
+// looking like normal content that happens to be paginated.
+const STATUS_STYLE: Record<string, string> = {
+  published: "badge badge-muted",
+  draft: "badge badge-muted",
+  archived: "badge badge-h",
+};
+
 export default async function AdminQuestionsPage({ searchParams }: { searchParams: SearchParams }) {
   const sp = await searchParams;
   const filters = {
@@ -30,22 +48,39 @@ export default async function AdminQuestionsPage({ searchParams }: { searchParam
     category: first(sp.category),
     difficulty: first(sp.difficulty),
     q: first(sp.q),
+    status: first(sp.status),
   };
   const requestedPage = Number.parseInt(first(sp.page) ?? "1", 10);
 
-  const [{ items, total, totalPages, page }, options] = await Promise.all([
-    getQuestions(filters, Number.isNaN(requestedPage) ? 1 : requestedPage),
-    getFilterOptions(),
+  const [{ items, total, totalPages, page }, options, stats, byStatus] = await Promise.all([
+    getQuestions(filters, Number.isNaN(requestedPage) ? 1 : requestedPage, { includeAll: true }),
+    getFilterOptions(true),
+    getStats(true),
+    getStatusCounts(),
   ]);
 
-  const hasFilters = Boolean(filters.role || filters.category || filters.difficulty || filters.q);
+  const liveCount = byStatus["published"] ?? 0;
+  const draftCount = byStatus["draft"] ?? 0;
+  const archivedCount = byStatus["archived"] ?? 0;
+
+  const hasFilters = Boolean(
+    filters.role || filters.category || filters.difficulty || filters.q || filters.status,
+  );
 
   return (
     <div className="space-y-6">
       <div className="flex flex-wrap items-end justify-between gap-3">
         <div>
           <h1 className="font-display text-2xl font-semibold tracking-tight">Kelola soal</h1>
-          <p className="text-sm text-fg-muted">{total} soal ditemukan.</p>
+          <p className="text-sm text-fg-muted">
+            {total} soal ditemukan.
+            {/* Counts come from getStats(true), not from the current filter, so an
+                archived row is never mistaken for a row the filter hid. */}
+            {hasFilters ? `Total seluruh status: ${stats.total}.` : null}{" "}
+            <span className="text-fg-soft">
+              {liveCount} terbit · {draftCount} draf · {archivedCount} arsip
+            </span>
+          </p>
         </div>
         <Link href="/admin/questions/new" className="btn-primary px-3 py-3 sm:py-2">
           Tambah soal
@@ -103,6 +138,18 @@ export default async function AdminQuestionsPage({ searchParams }: { searchParam
           </select>
         </label>
 
+        <label className="flex flex-col gap-1 text-xs font-medium text-fg-muted">
+          Status
+          <select name="status" defaultValue={filters.status ?? ""} className={selectClass}>
+            <option value="">Semua status</option>
+            {STATUSES.map((status) => (
+              <option key={status} value={status}>
+                {statusLabels[status]}
+              </option>
+            ))}
+          </select>
+        </label>
+
         <div className="flex items-center gap-3">
           <button type="submit" className="btn-primary w-full px-4 py-3 sm:py-1.5">
             Terapkan
@@ -115,26 +162,37 @@ export default async function AdminQuestionsPage({ searchParams }: { searchParam
         </div>
       </form>
 
-      <div className="card overflow-x-auto">
-        <table className="w-full min-w-[40rem] text-left text-sm">
+      <div className="overflow-x-auto rounded-[20px] border-2 border-line">
+        <table className="w-full min-w-[46rem] text-left text-sm">
           <thead className="hairline text-xs">
             <tr>
               <th className="px-4 py-2 font-medium text-fg-soft">Pertanyaan</th>
               <th className="px-4 py-2 font-medium text-fg-soft">Role</th>
-              <th className="px-4 py-2 font-medium text-fg-soft">Topik</th>
+              <th className="px-4 py-2 font-medium text-fg-soft">Bidang</th>
               <th className="px-4 py-2 font-medium text-fg-soft">Kesulitan</th>
+              <th className="px-4 py-2 font-medium text-fg-soft">Status</th>
               <th className="px-4 py-2 text-right font-medium text-fg-soft">Aksi</th>
             </tr>
           </thead>
           <tbody className="lines">
             {items.map((question) => (
-              <tr key={question.id} className="align-top hover:bg-surface-muted">
+              <tr
+                key={question.id}
+                className={`align-top hover:bg-soft ${question.status === "archived" ? "opacity-60" : ""}`}
+              >
                 <td className="max-w-md px-4 py-3 font-medium">{question.question}</td>
                 <td className="px-4 py-3 text-fg-muted">{roleLabel(question.role)}</td>
-                <td className="px-4 py-3 text-fg-muted">{titleize(question.category)}</td>
+                <td className="px-4 py-3 text-fg-muted">
+                  {question.topic ? topicLabel(question.topic) : titleize(question.category)}
+                </td>
                 <td className="px-4 py-3">
                   <span className={difficultyStyles[question.difficulty] ?? "badge badge-muted"}>
                     {difficultyLabels[question.difficulty] ?? question.difficulty}
+                  </span>
+                </td>
+                <td className="px-4 py-3">
+                  <span className={STATUS_STYLE[question.status] ?? "badge badge-muted"}>
+                    {statusLabels[question.status] ?? question.status}
                   </span>
                 </td>
                 <td className="px-4 py-3">
@@ -145,17 +203,33 @@ export default async function AdminQuestionsPage({ searchParams }: { searchParam
                     >
                       Ubah
                     </Link>
-                    <form action={deleteQuestion}>
-                      <input type="hidden" name="id" value={question.id} />
-                      <DeleteButton />
-                    </form>
+                    {question.status === "archived" ? (
+                      // Restoring is the same write as deleting, only the other
+                      // direction, so it goes through the same action.
+                      <form action={deleteQuestion}>
+                        <input type="hidden" name="id" value={question.id} />
+                        <input type="hidden" name="status" value="published" />
+                        <button
+                          type="submit"
+                          className="link-accent rounded px-2 py-1 text-sm"
+                          title="Kembalikan ke katalog"
+                        >
+                          Pulihkan
+                        </button>
+                      </form>
+                    ) : (
+                      <form action={deleteQuestion}>
+                        <input type="hidden" name="id" value={question.id} />
+                        <DeleteButton />
+                      </form>
+                    )}
                   </div>
                 </td>
               </tr>
             ))}
             {items.length === 0 && (
               <tr>
-                <td colSpan={5} className="px-4 py-6 text-center text-sm text-fg-soft">
+                <td colSpan={6} className="px-4 py-6 text-center text-sm text-fg-soft">
                   Tidak ada soal yang cocok.
                 </td>
               </tr>

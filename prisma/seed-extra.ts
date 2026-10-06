@@ -4,6 +4,7 @@ import { PrismaClient } from "../src/generated/prisma/client";
 import { extraQuestions } from "./data/extra-questions";
 import { companyCaseQuestions } from "./data/company-cases";
 import { companyCaseQuestions2 } from "./data/company-cases-2";
+import { applyTopicClassification } from "./topic-classification";
 
 const allQuestions = [...extraQuestions, ...companyCaseQuestions, ...companyCaseQuestions2];
 
@@ -29,6 +30,14 @@ async function main() {
     const data = toInsert.map(({ source: _source, ...question }) => question);
     await prisma.question.createMany({ data });
     console.log(`Seed extra selesai: ${toInsert.length} soal baru ditambahkan.`);
+  }
+
+  // Applies to every row, not just the ones inserted above, so running this twice
+  // also repairs questions inserted by an older version of the seed or by import.
+  const problems = await applyTopicClassification(prisma);
+  if (problems.length > 0) {
+    console.log(`Peringatan: ${problems.length} soal belum terklasifikasi:`);
+    problems.forEach((line) => console.log(`  ${line}`));
   }
 
   await prisma.$disconnect();

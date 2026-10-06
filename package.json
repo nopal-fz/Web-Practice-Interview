@@ -13,6 +13,8 @@
     "db:seed": "prisma db seed",
     "db:seed:extra": "tsx prisma/seed-extra.ts",
     "db:sync": "tsx scripts/devdb-to-turso.ts",
+    "db:classify": "tsx scripts/backfill-topic.ts",
+    "db:verify": "tsx scripts/verify-phase1.ts",
     "postinstall": "prisma generate"
   },
   "dependencies": {

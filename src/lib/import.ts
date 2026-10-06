@@ -1,5 +1,6 @@
 import Papa from "papaparse";
-import { normalizeTags, checkLengths } from "./format";
+import { normalizeTags, normalizeKeyConcepts, checkLengths, STATUSES } from "./format";
+import { TOPIC_OPTIONS } from "./topics";
 
 export type ImportRow = {
   role: string;
@@ -8,6 +9,9 @@ export type ImportRow = {
   question: string;
   answer: string;
   tags: string;
+  topic: string;
+  keyConcepts: string;
+  status: string;
 };
 
 export type ParseResult = { rows: ImportRow[]; errors: string[] };
@@ -53,13 +57,39 @@ function toRow(raw: Record<string, unknown>, index: number, errors: string[]): I
   const rawTags = raw["tags"];
   const tags = normalizeTags(Array.isArray(rawTags) ? rawTags.join(",") : get("tags"));
 
-  const tooLong = checkLengths({ question, answer, tags });
+  // Optional since the columns predate them. Absent topic stays "" (unclassified)
+  // rather than being guessed, because a wrong group is worse than a missing one
+  // once progress starts being scored per topic. Absent status means published,
+  // which is what every imported row used to be.
+  const rawTopic = get("topic");
+  let topic = rawTopic;
+  if (rawTopic && !TOPIC_OPTIONS.includes(rawTopic)) {
+    errors.push(
+      `Baris ${index + 1}: topic "${rawTopic}" tidak dikenal, dikosongkan. ` +
+        `Pilihan: ${TOPIC_OPTIONS.join(", ")}.`,
+    );
+    topic = "";
+  }
+
+  const rawKeyConcepts = raw["keyConcepts"] ?? raw["key_concepts"];
+  const keyConcepts = normalizeKeyConcepts(
+    Array.isArray(rawKeyConcepts) ? rawKeyConcepts.join(",") : get("keyConcepts"),
+  );
+
+  const rawStatus = (get("status") || "published").toLowerCase();
+  let status = rawStatus;
+  if (!STATUSES.includes(status as (typeof STATUSES)[number])) {
+    errors.push(`Baris ${index + 1}: status "${rawStatus}" tidak dikenal, dipakai "published".`);
+    status = "published";
+  }
+
+  const tooLong = checkLengths({ question, answer, tags, topic, keyConcepts });
   if (tooLong) {
     errors.push(`Baris ${index + 1}: ${tooLong}`);
     return null;
   }
 
-  return { role, category, difficulty, question, answer, tags };
+  return { role, category, difficulty, question, answer, tags, topic, keyConcepts, status };
 }
 
 export function parseRows(format: string, text: string): ParseResult {

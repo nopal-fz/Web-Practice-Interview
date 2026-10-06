@@ -3,7 +3,8 @@
 import { useActionState, useState } from "react";
 import { saveQuestion } from "@/app/admin/actions";
 import { Markdown } from "@/components/markdown";
-import { FIELD_LIMITS } from "@/lib/format";
+import { FIELD_LIMITS, STATUSES, statusLabels } from "@/lib/format";
+import { TOPIC_OPTIONS, topicLabel } from "@/lib/topics";
 
 export type EditableQuestion = {
   id: string;
@@ -13,6 +14,9 @@ export type EditableQuestion = {
   question: string;
   answer: string;
   tags: string;
+  topic: string;
+  keyConcepts: string;
+  status: string;
 };
 
 const fieldClass = "field px-3 py-3 text-sm sm:py-2";
@@ -21,14 +25,20 @@ export function QuestionForm({
   question,
   roles,
   categories,
+  topics,
 }: {
   question?: EditableQuestion;
   roles: string[];
   categories: string[];
+  topics: string[];
 }) {
   const [state, formAction, pending] = useActionState(saveQuestion, {});
   const [answer, setAnswer] = useState(question?.answer ?? "");
   const [preview, setPreview] = useState(false);
+  // Unclassified questions must stay reachable, so the list is the fixed taxonomy
+  // plus whatever topic values already exist in the catalog. An empty topic is a
+  // valid choice, not a placeholder to force away.
+  const topicOptions = [...new Set([...topics, ...TOPIC_OPTIONS])];
 
   return (
     <form action={formAction} className="space-y-5">
@@ -82,6 +92,49 @@ export function QuestionForm({
           </select>
         </label>
       </div>
+
+      <div className="grid gap-4 sm:grid-cols-[2fr_1fr]">
+        <label className="flex flex-col gap-1 text-sm font-medium text-fg-muted">
+          {/* Skill group above Topik. Scoring and weak-area reporting group by this,
+              so it is a fixed list: a free-text value here would recreate the
+              fragmentation that made 53 categories unusable for progress. */}
+          Bidang
+          <select name="topic" defaultValue={question?.topic ?? ""} className={fieldClass}>
+            <option value="">Belum dikelompokkan</option>
+            {topicOptions.map((topic) => (
+              <option key={topic} value={topic}>
+                {topicLabel(topic)}
+              </option>
+            ))}
+          </select>
+        </label>
+
+        <label className="flex flex-col gap-1 text-sm font-medium text-fg-muted">
+          Status
+          <select name="status" defaultValue={question?.status ?? "published"} className={fieldClass}>
+            {STATUSES.map((status) => (
+              <option key={status} value={status}>
+                {statusLabels[status]}
+              </option>
+            ))}
+          </select>
+        </label>
+      </div>
+
+      <label className="flex flex-col gap-1 text-sm font-medium text-fg-muted">
+        {/* The rubric an AI judge grades against. Kept separate from the answer on
+            purpose: "which concept did they miss" is only answerable if the
+            expected concepts are listed on their own. */}
+        Konsep kunci (pisahkan dengan koma)
+        <input
+          type="text"
+          name="keyConcepts"
+          maxLength={FIELD_LIMITS.keyConcepts}
+          defaultValue={question?.keyConcepts}
+          placeholder="backpropagation, activation function, vanishing gradient"
+          className={fieldClass}
+        />
+      </label>
 
       <label className="flex flex-col gap-1 text-sm font-medium text-fg-muted">
         Pertanyaan

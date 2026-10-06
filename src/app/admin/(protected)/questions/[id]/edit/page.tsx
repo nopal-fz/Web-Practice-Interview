@@ -10,7 +10,12 @@ export default async function EditQuestionPage({
   params: Promise<{ id: string }>;
 }) {
   const { id } = await params;
-  const [question, options] = await Promise.all([getQuestion(id), getFilterOptions()]);
+  // includeAll: an admin must be able to reopen a draft or an archived row,
+  // otherwise a soft-deleted question could never be reviewed or restored.
+  const [question, options] = await Promise.all([
+    getQuestion(id, { includeAll: true }),
+    getFilterOptions(true),
+  ]);
 
   if (!question) {
     notFound();
@@ -28,9 +33,13 @@ export default async function EditQuestionPage({
           question: question.question,
           answer: question.answer,
           tags: question.tags,
+          topic: question.topic,
+          keyConcepts: question.keyConcepts,
+          status: question.status,
         }}
         roles={options.roles}
         categories={options.categories}
+        topics={options.topics}
       />
     </div>
   );

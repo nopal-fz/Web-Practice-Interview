@@ -13,17 +13,29 @@ datasource db {
 }
 
 model Question {
-  id         String   @id @default(cuid())
-  role       String
-  category   String
-  difficulty String   @default("medium")
-  question   String
-  answer     String
-  tags       String   @default("")
-  createdAt  DateTime @default(now())
-  updatedAt  DateTime @updatedAt
+  id          String   @id @default(cuid())
+  role        String
+  category    String
+  difficulty  String   @default("medium")
+  question    String
+  answer      String
+  tags        String   @default("")
+  // Skill group above the free-text category. The 53 category values are too
+  // fine-grained to compare a user's scores across (some hold a single question),
+  // so topic is the unit progress and weak-area reporting will group by.
+  topic       String   @default("")
+  // Comma-separated rubric the AI judge grades against. Deliberately not the
+  // reference answer: "which concepts did they miss" is only answerable if the
+  // expected concepts are listed separately from the prose answer.
+  keyConcepts String   @default("")
+  // draft = hidden from the public catalog, archived = soft-deleted by an admin.
+  // Both stay in the table so an edit or an accidental delete is recoverable.
+  status      String   @default("published")
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
 
   @@index([role])
   @@index([category])
   @@index([difficulty])
+  @@index([topic])
 }

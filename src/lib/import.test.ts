@@ -36,4 +36,53 @@ assert.equal(parsedCsv.rows.length, 1);
 assert.equal(parsedCsv.rows[0].question, "Soal, dengan koma");
 assert.equal(parsedCsv.rows[0].tags, "sql,query");
 
+// topic / keyConcepts / status. Absent means published + unclassified, which is
+// what every row looked like before these columns existed.
+const legacy = parseRows(
+  "json",
+  JSON.stringify([{ role: "r", category: "c", question: "q", answer: "a" }]),
+);
+assert.equal(legacy.rows[0].status, "published");
+assert.equal(legacy.rows[0].topic, "");
+assert.equal(legacy.errors.length, 0);
+
+const classified = parseRows(
+  "json",
+  JSON.stringify([
+    {
+      role: "ml-engineer",
+      category: "deep-learning",
+      question: "q",
+      answer: "a",
+      topic: "deep-learning",
+      keyConcepts: ["Gradient Descent", "backpropagation"],
+      status: "draft",
+    },
+  ]),
+);
+assert.equal(classified.rows[0].topic, "deep-learning");
+assert.equal(classified.rows[0].keyConcepts, "gradient descent,backpropagation");
+assert.equal(classified.rows[0].status, "draft");
+assert.equal(classified.errors.length, 0);
+
+// An unknown topic must NOT be silently accepted: a wrong group is worse than a
+// missing one once progress is scored per topic. It is dropped and reported.
+const badTopic = parseRows(
+  "json",
+  JSON.stringify([
+    { role: "r", category: "c", question: "q", answer: "a", topic: "prompt-crafting" },
+    { role: "r", category: "c", question: "q2", answer: "a", status: "hidden" },
+  ]),
+);
+assert.equal(badTopic.rows[0].topic, "");
+assert.ok(
+  badTopic.errors.some((e) => e.includes("prompt-crafting")),
+  "unknown topic must be reported",
+);
+assert.equal(badTopic.rows[1].status, "published");
+assert.ok(
+  badTopic.errors.some((e) => e.includes("hidden")),
+  "unknown status must be reported",
+);
+
 console.log("import parser ok");

@@ -4,12 +4,16 @@ import { getFilterOptions } from "@/lib/questions";
 export const metadata = { title: "Tambah soal" };
 
 export default async function NewQuestionPage() {
-  const options = await getFilterOptions();
+  const options = await getFilterOptions(true);
 
   return (
     <div className="space-y-6">
       <h1 className="font-display text-2xl font-semibold tracking-tight">Tambah soal</h1>
-      <QuestionForm roles={options.roles} categories={options.categories} />
+      <QuestionForm
+        roles={options.roles}
+        categories={options.categories}
+        topics={options.topics}
+      />
     </div>
   );
 }

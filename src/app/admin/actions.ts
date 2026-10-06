@@ -8,23 +8,19 @@ import {
   setSessionCookie,
 } from "@/lib/auth";
 import { prisma } from "@/lib/db";
-import { normalizeTags, checkLengths, FIELD_LIMITS } from "@/lib/format";
+import {
+  normalizeTags,
+  normalizeKeyConcepts,
+  checkLengths,
+  slugify,
+  FIELD_LIMITS,
+  STATUSES,
+} from "@/lib/format";
 import { parseRows, MAX_UPLOAD_BYTES, MAX_UPLOAD_CHARS, MAX_UPLOAD_MB, MAX_IMPORT_ROWS } from "@/lib/import";
 import { clearAttempts, recordFailure, remainingAttempts } from "@/lib/rate-limit";
+import { TOPIC_OPTIONS } from "@/lib/topics";
 
 type ActionState = { error?: string };
-
-// Strips to slug-safe characters. Previously only lowercased and collapsed
-// whitespace, so quotes, angle brackets and control characters survived into
-// role/category values.
-function slugify(value: string): string {
-  return value
-    .trim()
-    .toLowerCase()
-    .replace(/[^a-z0-9._-]+/g, "-")
-    .replace(/^-+|-+$/g, "")
-    .slice(0, FIELD_LIMITS.role);
-}
 
 export async function login(_prev: ActionState, formData: FormData): Promise<ActionState> {
   const username = String(formData.get("username") ?? "");
@@ -64,12 +60,15 @@ export async function saveQuestion(_prev: ActionState, formData: FormData): Prom
   await requireAdmin();
 
   const id = String(formData.get("id") ?? "");
-  const role = slugify(String(formData.get("role") ?? ""));
-  const category = slugify(String(formData.get("category") ?? ""));
+  const role = slugify(String(formData.get("role") ?? ""), FIELD_LIMITS.role);
+  const category = slugify(String(formData.get("category") ?? ""), FIELD_LIMITS.category);
   const difficulty = String(formData.get("difficulty") ?? "medium").toLowerCase();
   const question = String(formData.get("question") ?? "").trim();
   const answer = String(formData.get("answer") ?? "").trim();
   const tags = normalizeTags(String(formData.get("tags") ?? ""));
+  const topic = slugify(String(formData.get("topic") ?? ""), FIELD_LIMITS.topic);
+  const keyConcepts = normalizeKeyConcepts(String(formData.get("keyConcepts") ?? ""));
+  const status = String(formData.get("status") ?? "published").toLowerCase();
 
   if (!role || !category || !question || !answer) {
     return { error: "Role, topik, pertanyaan, dan jawaban wajib diisi." };
@@ -77,11 +76,22 @@ export async function saveQuestion(_prev: ActionState, formData: FormData): Prom
   if (!["easy", "medium", "hard"].includes(difficulty)) {
     return { error: "Tingkat kesulitan tidak valid." };
   }
+  if (!STATUSES.includes(status as (typeof STATUSES)[number])) {
+    return { error: "Status tidak valid." };
+  }
+  // The form offers topic as a <select>, but a <select> is a client-side
+  // convenience, not a constraint: this action is reachable by POST directly. An
+  // open-ended topic value would recreate the 53-category fragmentation the field
+  // exists to prevent, so the taxonomy is enforced here too. Empty means
+  // "not classified yet" and stays allowed.
+  if (topic && !TOPIC_OPTIONS.includes(topic)) {
+    return { error: "Bidang tidak valid. Pilih salah satu dari daftar." };
+  }
 
-  const tooLong = checkLengths({ question, answer, tags });
+  const tooLong = checkLengths({ question, answer, tags, topic, keyConcepts });
   if (tooLong) return { error: tooLong };
 
-  const data = { role, category, difficulty, question, answer, tags };
+  const data = { role, category, difficulty, question, answer, tags, topic, keyConcepts, status };
 
   if (id) {
     await prisma.question.update({ where: { id }, data });
@@ -92,13 +102,22 @@ export async function saveQuestion(_prev: ActionState, formData: FormData): Prom
   redirect("/admin/questions");
 }
 
+// Soft delete. The row stays in the table so a mistaken delete is recoverable and
+// so anything that will later reference this question (student answers, scores)
+// does not break when an admin tidies the catalog. The catalog only ever reads
+// status="published", so an archived question is invisible to the public.
+//
+// Pass status to move a row somewhere other than archived, which is how the
+// admin list restores one.
 export async function deleteQuestion(formData: FormData): Promise<void> {
   await requireAdmin();
 
   const id = String(formData.get("id") ?? "");
-  if (id) {
-    await prisma.question.delete({ where: { id } });
-  }
+  const status = String(formData.get("status") ?? "archived").toLowerCase();
+  if (!id) return;
+  if (!STATUSES.includes(status as (typeof STATUSES)[number])) return;
+
+  await prisma.question.update({ where: { id }, data: { status } });
   redirect("/admin/questions");
 }
 
