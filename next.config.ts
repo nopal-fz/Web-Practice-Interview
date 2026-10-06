@@ -1,7 +1,9 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
-  serverExternalPackages: ["better-sqlite3"],
+  // @libsql/client loads a platform-specific native binding at runtime. Bundling
+  // it breaks that lookup on Vercel, so keep it as a runtime require.
+  serverExternalPackages: ["@libsql/client"],
 
   // Public deployment headers. Without these the site works but gives a browser
   // no instructions about framing, sniffing or referrer policy, so any future

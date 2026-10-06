@@ -10,10 +10,10 @@ export default async function LoginPage() {
   }
 
   return (
-    <div className="mx-auto max-w-sm space-y-6 py-6">
+    <div className="wrap max-w-sm space-y-6 py-10">
       <div className="space-y-1">
         <p className="eyebrow font-mono">ADMIN_ACCESS</p>
-        <h1 className="font-heading text-2xl font-semibold text-foreground">Admin Console</h1>
+        <h1 className="font-display text-2xl font-semibold text-ink">Admin Console</h1>
         <p className="text-sm text-fg-muted">
           Akses manajemen soal interview. Autentikasi diperlukan.
         </p>

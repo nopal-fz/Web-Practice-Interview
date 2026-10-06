@@ -31,11 +31,7 @@ export function LoginForm() {
       </label>
 
       {state.error && (
-        <p
-          role="alert"
-          className="rounded border px-3 py-2 text-sm text-fg"
-          style={{ borderColor: "var(--hardt)", background: "var(--hard)" }}
-        >
+        <p role="alert" className="notice notice-err">
           {state.error}
         </p>
       )}

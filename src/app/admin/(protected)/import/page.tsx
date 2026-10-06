@@ -19,11 +19,7 @@ export default async function ImportPage({ searchParams }: { searchParams: Searc
       </div>
 
       {!Number.isNaN(imported) && (
-        <p
-          role="status"
-          className="rounded border px-3 py-2 text-sm text-fg"
-          style={{ borderColor: "var(--success)", background: "var(--badge-easy-bg)" }}
-        >
+        <p role="status" className="notice notice-ok">
           {imported} soal berhasil diimpor
           {!Number.isNaN(skipped) && skipped > 0 ? `, ${skipped} baris dilewati.` : "."}
         </p>
@@ -34,12 +30,12 @@ export default async function ImportPage({ searchParams }: { searchParams: Searc
       <section className="card space-y-3 p-4 text-sm text-fg-muted">
         <h2 className="font-display text-base font-semibold tracking-tight">Format data</h2>
         <p>
-          Field wajib: <code className="rounded border border-border bg-surface-muted px-1.5 py-0.5 text-xs">role</code>,{" "}
-          <code className="rounded border border-border bg-surface-muted px-1.5 py-0.5 text-xs">category</code>,{" "}
-          <code className="rounded border border-border bg-surface-muted px-1.5 py-0.5 text-xs">question</code>,{" "}
-          <code className="rounded border border-border bg-surface-muted px-1.5 py-0.5 text-xs">answer</code>. Field opsional:{" "}
-          <code className="rounded border border-border bg-surface-muted px-1.5 py-0.5 text-xs">difficulty</code> (easy/medium/hard, default
-          medium) dan <code className="rounded border border-border bg-surface-muted px-1.5 py-0.5 text-xs">tags</code>.
+          Field wajib: <code className="rounded border border-line bg-soft px-1.5 py-0.5 font-mono text-xs">role</code>,{" "}
+          <code className="rounded border border-line bg-soft px-1.5 py-0.5 font-mono text-xs">category</code>,{" "}
+          <code className="rounded border border-line bg-soft px-1.5 py-0.5 font-mono text-xs">question</code>,{" "}
+          <code className="rounded border border-line bg-soft px-1.5 py-0.5 font-mono text-xs">answer</code>. Field opsional:{" "}
+          <code className="rounded border border-line bg-soft px-1.5 py-0.5 font-mono text-xs">difficulty</code> (easy/medium/hard, default
+          medium) dan <code className="rounded border border-line bg-soft px-1.5 py-0.5 font-mono text-xs">tags</code>.
         </p>
         <p>JSON: array soal, atau objek dengan field &quot;questions&quot; berisi array.</p>
         <pre className="prose-answer overflow-x-auto">{`[

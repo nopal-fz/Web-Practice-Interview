@@ -329,6 +329,29 @@ body {
   .link-accent:hover {
     text-decoration: underline;
   }
+
+  /* Inline notice banner (form errors, import result). Lives in the stylesheet
+     on purpose: a style={{}} attribute is governed by style-src-attr, and a
+     nonce never applies to one, so the nonce CSP in proxy.ts would blank out
+     any banner styled inline. Colours come from the same tokens as .badge-m /
+     .badge-h, so the banner and the difficulty badges read as one family. */
+  .notice {
+    border: 2px solid transparent;
+    border-radius: 12px;
+    padding: 10px 14px;
+    font-size: 14px;
+    font-weight: 700;
+  }
+  .notice-err {
+    border-color: var(--hard);
+    background: var(--hard);
+    color: var(--hardt);
+  }
+  .notice-ok {
+    border-color: var(--ok);
+    background: var(--ok);
+    color: var(--okt);
+  }
   .eyebrow {
     font-weight: 800;
     font-size: 13px;
@@ -356,21 +379,7 @@ body {
   .btn-ghost:hover {
     border-color: var(--pri);
   }
-  .field {
-    width: 100%;
-    background: var(--bg);
-    color: var(--ink);
-    border: 2px solid var(--line);
-    border-radius: 12px;
-    font-size: 15px;
-    font-weight: 500;
-    transition: border-color 150ms ease;
   }
-  .field:focus-visible {
-    outline: none;
-    border-color: var(--pri);
-  }
-}
 
 /* Markdown answers. Line length capped so long prose stays readable. */
 .prose-answer {

@@ -1,5 +1,5 @@
 import "dotenv/config";
-import { PrismaBetterSqlite3 } from "@prisma/adapter-better-sqlite3";
+import { PrismaLibSql } from "@prisma/adapter-libsql";
 import { PrismaClient } from "../src/generated/prisma/client";
 
 type SeedQuestion = {
@@ -565,8 +565,9 @@ Praktik: log input dan output model di produksi, siapkan shadow mode untuk memba
 ];
 
 async function main() {
-  const adapter = new PrismaBetterSqlite3({
+  const adapter = new PrismaLibSql({
     url: process.env.DATABASE_URL ?? "file:./dev.db",
+    authToken: process.env.DATABASE_AUTH_TOKEN,
   });
   const prisma = new PrismaClient({ adapter });
 
